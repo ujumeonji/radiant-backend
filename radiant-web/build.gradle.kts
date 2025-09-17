@@ -15,6 +15,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
     implementation("com.netflix.graphql.dgs:graphql-dgs-spring-graphql-starter")
+    implementation("com.graphql-java:graphql-java-extended-scalars")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.test:spring-test")
