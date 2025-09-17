@@ -1,0 +1,3 @@
+[submodule "radiant-web/src/main/resources/schema"]
+	path = radiant-web/src/main/resources/schema
+	url = https://github.com/ujumeonji/radiant-schema.git
