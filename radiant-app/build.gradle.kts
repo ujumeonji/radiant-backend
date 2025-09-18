@@ -16,6 +16,8 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.springframework.ai:spring-ai-starter-model-openai")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
