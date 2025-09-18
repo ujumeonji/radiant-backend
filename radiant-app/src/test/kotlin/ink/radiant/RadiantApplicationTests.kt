@@ -1,6 +1,5 @@
-package ink.radiant.app
+package ink.radiant
 
-import ink.radiant.RadiantApplication
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
