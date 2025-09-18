@@ -1,9 +1,11 @@
 package ink.radiant.query.service
 
+import ink.radiant.core.domain.event.PostViewedEvent
 import ink.radiant.core.domain.model.PageInfo
 import ink.radiant.core.domain.model.Post
 import ink.radiant.core.domain.model.PostConnection
 import ink.radiant.core.domain.model.PostEdge
+import ink.radiant.infrastructure.messaging.EventPublisher
 import ink.radiant.query.entity.PostEntity
 import ink.radiant.query.repository.PostRepository
 import org.springframework.data.domain.Page
@@ -15,6 +17,7 @@ import java.util.*
 @Service
 class PostQueryService(
     private val postRepository: PostRepository,
+    private val eventPublisher: EventPublisher,
 ) : QueryService() {
 
     fun findPosts(first: Int?, after: String?): PostConnection {
@@ -55,7 +58,17 @@ class PostQueryService(
     }
 
     fun findPostById(id: String): Post? {
-        return postRepository.findByIdAndNotDeleted(id)?.toDomainModel()
+        val post = postRepository.findByIdAndNotDeleted(id)?.toDomainModel()
+
+        if (post != null) {
+            val event = PostViewedEvent(
+                aggregateId = id,
+                postId = id,
+            )
+            eventPublisher.publish(event)
+        }
+
+        return post
     }
 
     private fun encodeCursor(dateTime: OffsetDateTime): String {
