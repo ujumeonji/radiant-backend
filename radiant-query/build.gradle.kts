@@ -7,6 +7,7 @@ plugins {
 
 dependencies {
     implementation(project(":radiant-core"))
+    implementation(project(":radiant-infrastructure"))
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter")
