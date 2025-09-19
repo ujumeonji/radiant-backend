@@ -4,6 +4,7 @@ plugins {
     kotlin("plugin.jpa")
     id("org.springframework.boot")
     id("io.spring.dependency-management")
+    id("com.google.cloud.tools.jib")
 }
 
 dependencies {
@@ -55,4 +56,55 @@ tasks.getByName<Jar>("jar") {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+jib {
+    from {
+        image = "eclipse-temurin:17-jre-alpine"
+        platforms {
+            platform {
+                architecture = "amd64"
+                os = "linux"
+            }
+        }
+    }
+    to {
+        image = "${System.getenv("ECR_REGISTRY") ?: "123456789012.dkr.ecr.ap-northeast-2.amazonaws.com"}/radiant-app"
+        tags = setOf("latest", version.toString())
+        credHelper {
+            helper = "ecr-login"
+        }
+    }
+    container {
+        jvmFlags =
+            listOf(
+                "-Xms512m",
+                "-Xmx2048m",
+                "-XX:+UseG1GC",
+                "-XX:MaxGCPauseMillis=100",
+                "-XX:+UseStringDeduplication",
+            )
+        ports = listOf("8080")
+        environment =
+            mapOf(
+                "SPRING_PROFILES_ACTIVE" to "prod",
+                "JAVA_TOOL_OPTIONS" to "-XX:+ExitOnOutOfMemoryError",
+            )
+        labels =
+            mapOf(
+                "maintainer" to "radiant-team",
+                "version" to version.toString(),
+                "description" to "Radiant Application",
+            )
+        creationTime = "USE_CURRENT_TIMESTAMP"
+        user = "1000:1000"
+    }
+    extraDirectories {
+        paths {
+            path {
+                setFrom(file("src/main/jib"))
+                into = "/app/config"
+            }
+        }
+    }
 }
