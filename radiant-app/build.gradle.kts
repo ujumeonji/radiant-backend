@@ -60,7 +60,7 @@ tasks.withType<Test> {
 
 jib {
     from {
-        image = "eclipse-temurin:17-jre-alpine"
+        image = "eclipse-temurin:21-jre-alpine"
         platforms {
             platform {
                 architecture = "amd64"
