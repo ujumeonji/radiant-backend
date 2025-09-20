@@ -1,0 +1,21 @@
+spring:
+  profiles:
+    group:
+      prod: prod
+
+  application:
+    name: radiant-app
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:sk-or-v1-xxx}
+      base-url: ${OPENAI_BASE_URL:https://openrouter.ai/api}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: default
