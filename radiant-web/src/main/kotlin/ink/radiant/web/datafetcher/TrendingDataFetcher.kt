@@ -4,8 +4,13 @@ import com.netflix.graphql.dgs.DgsComponent
 import com.netflix.graphql.dgs.DgsQuery
 import com.netflix.graphql.dgs.InputArgument
 import ink.radiant.query.service.TrendingPostService
+import ink.radiant.web.codegen.types.PageInfo
 import ink.radiant.web.codegen.types.Post
+import ink.radiant.web.codegen.types.PostConnection
+import ink.radiant.web.codegen.types.PostEdge
 import ink.radiant.web.codegen.types.Topic
+import ink.radiant.web.codegen.types.TopicConnection
+import ink.radiant.web.codegen.types.TopicEdge
 
 @DgsComponent
 class TrendingDataFetcher(
@@ -13,13 +18,25 @@ class TrendingDataFetcher(
 ) {
 
     @DgsQuery
-    fun trendingPosts(@InputArgument limit: Int?): List<Post> {
-        val requestedLimit = limit ?: DEFAULT_LIMIT
+    fun trendingPosts(@InputArgument first: Int?, @InputArgument after: String?): PostConnection {
+        val requestedLimit = first ?: DEFAULT_LIMIT
         val trendingPosts = trendingPostService.findTrendingPosts(requestedLimit)
 
-        return trendingPosts.map { post ->
-            post.toGraphQLPost()
-        }
+        return PostConnection(
+            edges = trendingPosts.mapIndexed { index, post ->
+                PostEdge(
+                    node = post.toGraphQLPost(),
+                    cursor = "cursor_${index + 1}",
+                )
+            },
+            pageInfo = PageInfo(
+                hasNextPage = false,
+                hasPreviousPage = false,
+                startCursor = if (trendingPosts.isNotEmpty()) "cursor_1" else null,
+                endCursor = if (trendingPosts.isNotEmpty()) "cursor_${trendingPosts.size}" else null,
+            ),
+            totalCount = trendingPosts.size,
+        )
     }
 
     private fun ink.radiant.core.domain.model.Post.toGraphQLPost(): Post {
@@ -32,18 +49,43 @@ class TrendingDataFetcher(
             translatedSentences = this.translatedSentences,
             createdAt = this.createdAt,
             updatedAt = this.updatedAt,
-            likes = this.likes,
+            likesCount = this.likes,
             commentsCount = this.commentsCount,
             thumbnailUrl = this.thumbnailUrl,
             author = null,
-            participants = emptyList(),
+            participants = ink.radiant.web.codegen.types.UserConnection(
+                edges = emptyList(),
+                pageInfo = ink.radiant.web.codegen.types.PageInfo(
+                    hasNextPage = false,
+                    hasPreviousPage = false,
+                    startCursor = null,
+                    endCursor = null,
+                ),
+                totalCount = 0,
+            ),
         )
     }
 
     @DgsQuery
-    fun popularTopics(@InputArgument limit: Int?): List<Topic> {
-        val requestedLimit = limit ?: DEFAULT_TOPICS_LIMIT
-        return generateMockTopics().take(requestedLimit)
+    fun popularTopics(@InputArgument first: Int?, @InputArgument after: String?): TopicConnection {
+        val requestedLimit = first ?: DEFAULT_TOPICS_LIMIT
+        val topics = generateMockTopics().take(requestedLimit)
+
+        return TopicConnection(
+            edges = topics.mapIndexed { index, topic ->
+                TopicEdge(
+                    node = topic,
+                    cursor = "topic_cursor_${index + 1}",
+                )
+            },
+            pageInfo = PageInfo(
+                hasNextPage = false,
+                hasPreviousPage = false,
+                startCursor = if (topics.isNotEmpty()) "topic_cursor_1" else null,
+                endCursor = if (topics.isNotEmpty()) "topic_cursor_${topics.size}" else null,
+            ),
+            totalCount = topics.size,
+        )
     }
 
     private fun generateMockTopics(): List<Topic> {
@@ -52,61 +94,161 @@ class TrendingDataFetcher(
                 id = "topic_1",
                 name = "Kotlin",
                 slug = "kotlin",
-                postCount = 156,
+                postsCount = 156,
+                posts = PostConnection(
+                    edges = emptyList(),
+                    pageInfo = ink.radiant.web.codegen.types.PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             ),
             Topic(
                 id = "topic_2",
                 name = "Spring Boot",
                 slug = "spring-boot",
-                postCount = 143,
+                postsCount = 143,
+                posts = PostConnection(
+                    edges = emptyList(),
+                    pageInfo = ink.radiant.web.codegen.types.PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             ),
             Topic(
                 id = "topic_3",
                 name = "Machine Learning",
                 slug = "machine-learning",
-                postCount = 128,
+                postsCount = 128,
+                posts = PostConnection(
+                    edges = emptyList(),
+                    pageInfo = ink.radiant.web.codegen.types.PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             ),
             Topic(
                 id = "topic_4",
                 name = "React",
                 slug = "react",
-                postCount = 119,
+                postsCount = 119,
+                posts = PostConnection(
+                    edges = emptyList(),
+                    pageInfo = ink.radiant.web.codegen.types.PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             ),
             Topic(
                 id = "topic_5",
                 name = "GraphQL",
                 slug = "graphql",
-                postCount = 98,
+                postsCount = 98,
+                posts = PostConnection(
+                    edges = emptyList(),
+                    pageInfo = ink.radiant.web.codegen.types.PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             ),
             Topic(
                 id = "topic_6",
                 name = "Docker",
                 slug = "docker",
-                postCount = 87,
+                postsCount = 87,
+                posts = PostConnection(
+                    edges = emptyList(),
+                    pageInfo = ink.radiant.web.codegen.types.PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             ),
             Topic(
                 id = "topic_7",
                 name = "Microservices",
                 slug = "microservices",
-                postCount = 76,
+                postsCount = 76,
+                posts = PostConnection(
+                    edges = emptyList(),
+                    pageInfo = ink.radiant.web.codegen.types.PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             ),
             Topic(
                 id = "topic_8",
                 name = "Vue.js",
                 slug = "vuejs",
-                postCount = 65,
+                postsCount = 65,
+                posts = PostConnection(
+                    edges = emptyList(),
+                    pageInfo = ink.radiant.web.codegen.types.PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             ),
             Topic(
                 id = "topic_9",
                 name = "TypeScript",
                 slug = "typescript",
-                postCount = 54,
+                postsCount = 54,
+                posts = PostConnection(
+                    edges = emptyList(),
+                    pageInfo = ink.radiant.web.codegen.types.PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             ),
             Topic(
                 id = "topic_10",
                 name = "DevOps",
                 slug = "devops",
-                postCount = 43,
+                postsCount = 43,
+                posts = PostConnection(
+                    edges = emptyList(),
+                    pageInfo = ink.radiant.web.codegen.types.PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             ),
         )
     }

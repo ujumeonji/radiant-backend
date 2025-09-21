@@ -37,7 +37,7 @@ class PostGraphQLTest : BaseGraphQLTest() {
                             id
                             title
                             body
-                            likes
+                            likesCount
                             commentsCount
                             createdAt
                         }
@@ -49,6 +49,7 @@ class PostGraphQLTest : BaseGraphQLTest() {
                         startCursor
                         endCursor
                     }
+                    totalCount
                 }
             }
         """.trimIndent()
@@ -69,16 +70,23 @@ class PostGraphQLTest : BaseGraphQLTest() {
         val query = """
             {
                 post(id: "post-1") {
-                    id
-                    title
-                    body
-                    originalSentences
-                    translatedSentences
-                    likes
-                    commentsCount
-                    thumbnailUrl
-                    createdAt
-                    updatedAt
+                    ... on Post {
+                        id
+                        title
+                        body
+                        originalSentences
+                        translatedSentences
+                        likesCount
+                        commentsCount
+                        thumbnailUrl
+                        createdAt
+                        updatedAt
+                    }
+                    ... on PostNotFoundError {
+                        message
+                        code
+                        postId
+                    }
                 }
             }
         """.trimIndent()
@@ -91,17 +99,24 @@ class PostGraphQLTest : BaseGraphQLTest() {
             .jsonPath("$.data.post.body").isEqualTo("첫 번째 포스트의 내용입니다.")
             .jsonPath("$.data.post.originalSentences[0]").isEqualTo("첫 번째 문장")
             .jsonPath("$.data.post.originalSentences[1]").isEqualTo("두 번째 문장")
-            .jsonPath("$.data.post.likes").isEqualTo(10)
+            .jsonPath("$.data.post.likesCount").isEqualTo(10)
             .jsonPath("$.data.post.commentsCount").isEqualTo(5)
     }
 
     @Test
-    fun `존재하지 않는 post 조회 시 null을 반환한다`() {
+    fun `존재하지 않는 post 조회 시 PostNotFoundError를 반환한다`() {
         val query = """
             {
                 post(id: "non-existent") {
-                    id
-                    title
+                    ... on Post {
+                        id
+                        title
+                    }
+                    ... on PostNotFoundError {
+                        message
+                        code
+                        postId
+                    }
                 }
             }
         """.trimIndent()
@@ -109,7 +124,9 @@ class PostGraphQLTest : BaseGraphQLTest() {
         executeGraphQLQuery(query)
             .expectStatus().isOk
             .expectBody()
-            .jsonPath("$.data.post").doesNotExist()
+            .jsonPath("$.data.post.code").isEqualTo("POST_NOT_FOUND")
+            .jsonPath("$.data.post.postId").isEqualTo("non-existent")
+            .jsonPath("$.data.post.message").isEqualTo("Post with id 'non-existent' not found")
     }
 
     @Test
@@ -128,6 +145,13 @@ class PostGraphQLTest : BaseGraphQLTest() {
                             title
                         }
                     }
+                    pageInfo {
+                        hasNextPage
+                        hasPreviousPage
+                        startCursor
+                        endCursor
+                    }
+                    totalCount
                 }
             }
         """.trimIndent()
