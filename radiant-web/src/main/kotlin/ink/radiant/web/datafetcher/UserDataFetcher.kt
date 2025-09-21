@@ -9,15 +9,33 @@ import ink.radiant.web.codegen.types.PostConnection
 import ink.radiant.web.codegen.types.PostEdge
 import ink.radiant.web.codegen.types.ProfessionalField
 import ink.radiant.web.codegen.types.User
+import ink.radiant.web.codegen.types.UserConnection
+import ink.radiant.web.codegen.types.UserEdge
 import java.time.OffsetDateTime
 
 @DgsComponent
 class UserDataFetcher {
 
     @DgsQuery
-    fun recommendedAuthors(@InputArgument limit: Int?): List<User> {
-        val requestedLimit = limit ?: DEFAULT_RECOMMENDED_LIMIT
-        return generateMockUsers().take(requestedLimit)
+    fun recommendedAuthors(@InputArgument first: Int?, @InputArgument after: String?): UserConnection {
+        val requestedLimit = first ?: DEFAULT_RECOMMENDED_LIMIT
+        val users = generateMockUsers().take(requestedLimit)
+
+        return UserConnection(
+            edges = users.mapIndexed { index, user ->
+                UserEdge(
+                    node = user,
+                    cursor = "user_cursor_${index + 1}",
+                )
+            },
+            pageInfo = PageInfo(
+                hasNextPage = false,
+                hasPreviousPage = false,
+                startCursor = if (users.isNotEmpty()) "user_cursor_1" else null,
+                endCursor = if (users.isNotEmpty()) "user_cursor_${users.size}" else null,
+            ),
+            totalCount = users.size,
+        )
     }
 
     @DgsQuery
@@ -40,6 +58,7 @@ class UserDataFetcher {
                     startCursor = null,
                     endCursor = null,
                 ),
+                totalCount = 0,
             )
 
         val mockPosts = generateMockPostsForUser(user)
@@ -59,6 +78,7 @@ class UserDataFetcher {
                 startCursor = if (posts.isNotEmpty()) "cursor_1" else null,
                 endCursor = if (posts.isNotEmpty()) "cursor_${posts.size}" else null,
             ),
+            totalCount = mockPosts.size,
         )
     }
 
@@ -68,86 +88,226 @@ class UserDataFetcher {
                 id = "user_1",
                 username = "john_doe",
                 name = "John Doe",
-                avatar = "https://example.com/avatar1.jpg",
+                avatarUrl = "https://example.com/avatar1.jpg",
                 bio = "Backend developer passionate about Kotlin and Spring Boot",
                 location = "Seoul, South Korea",
-                website = "https://johndoe.dev",
-                joinedDate = OffsetDateTime.now().minusMonths(6),
+                websiteUrl = "https://johndoe.dev",
+                joinedAt = OffsetDateTime.now().minusMonths(6),
                 postsCount = 25,
                 viewsCount = 1500,
                 followersCount = 150,
                 followingCount = 80,
-                fields = listOf(ProfessionalField.BACKEND),
-                followers = emptyList(),
-                following = emptyList(),
+                professionalFields = listOf(ProfessionalField.BACKEND),
+                followers = ink.radiant.web.codegen.types.UserConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
+                following = ink.radiant.web.codegen.types.UserConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
+                posts = PostConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             ),
             User(
                 id = "user_2",
                 username = "jane_smith",
                 name = "Jane Smith",
-                avatar = "https://example.com/avatar2.jpg",
+                avatarUrl = "https://example.com/avatar2.jpg",
                 bio = "Frontend engineer and UI/UX enthusiast",
                 location = "Busan, South Korea",
-                website = "https://janesmith.com",
-                joinedDate = OffsetDateTime.now().minusMonths(8),
+                websiteUrl = "https://janesmith.com",
+                joinedAt = OffsetDateTime.now().minusMonths(8),
                 postsCount = 42,
                 viewsCount = 2800,
                 followersCount = 320,
                 followingCount = 120,
-                fields = listOf(ProfessionalField.FRONTEND),
-                followers = emptyList(),
-                following = emptyList(),
+                professionalFields = listOf(ProfessionalField.FRONTEND),
+                followers = ink.radiant.web.codegen.types.UserConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
+                following = ink.radiant.web.codegen.types.UserConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
+                posts = PostConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             ),
             User(
                 id = "user_3",
                 username = "ai_researcher",
                 name = "Dr. Sarah Kim",
-                avatar = "https://example.com/avatar3.jpg",
+                avatarUrl = "https://example.com/avatar3.jpg",
                 bio = "AI/ML researcher and data scientist",
                 location = "Daejeon, South Korea",
-                website = "https://sarahkim.ai",
-                joinedDate = OffsetDateTime.now().minusMonths(12),
+                websiteUrl = "https://sarahkim.ai",
+                joinedAt = OffsetDateTime.now().minusMonths(12),
                 postsCount = 38,
                 viewsCount = 5200,
                 followersCount = 680,
                 followingCount = 95,
-                fields = listOf(ProfessionalField.AI_ML),
-                followers = emptyList(),
-                following = emptyList(),
+                professionalFields = listOf(ProfessionalField.AI_ML),
+                followers = ink.radiant.web.codegen.types.UserConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
+                following = ink.radiant.web.codegen.types.UserConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
+                posts = PostConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             ),
             User(
                 id = "user_4",
                 username = "fullstack_dev",
                 name = "Alex Park",
-                avatar = "https://example.com/avatar4.jpg",
+                avatarUrl = "https://example.com/avatar4.jpg",
                 bio = "Full-stack developer working with modern web technologies",
                 location = "Incheon, South Korea",
-                website = null,
-                joinedDate = OffsetDateTime.now().minusMonths(3),
+                websiteUrl = null,
+                joinedAt = OffsetDateTime.now().minusMonths(3),
                 postsCount = 18,
                 viewsCount = 900,
                 followersCount = 75,
                 followingCount = 45,
-                fields = listOf(ProfessionalField.BACKEND, ProfessionalField.FRONTEND),
-                followers = emptyList(),
-                following = emptyList(),
+                professionalFields = listOf(ProfessionalField.BACKEND, ProfessionalField.FRONTEND),
+                followers = ink.radiant.web.codegen.types.UserConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
+                following = ink.radiant.web.codegen.types.UserConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
+                posts = PostConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             ),
             User(
                 id = "user_5",
                 username = "ml_engineer",
                 name = "Chris Lee",
-                avatar = "https://example.com/avatar5.jpg",
+                avatarUrl = "https://example.com/avatar5.jpg",
                 bio = "Machine learning engineer focused on deep learning applications",
                 location = "Gwangju, South Korea",
-                website = "https://chrislee.ml",
-                joinedDate = OffsetDateTime.now().minusMonths(10),
+                websiteUrl = "https://chrislee.ml",
+                joinedAt = OffsetDateTime.now().minusMonths(10),
                 postsCount = 31,
                 viewsCount = 3400,
                 followersCount = 420,
                 followingCount = 110,
-                fields = listOf(ProfessionalField.AI_ML),
-                followers = emptyList(),
-                following = emptyList(),
+                professionalFields = listOf(ProfessionalField.AI_ML),
+                followers = ink.radiant.web.codegen.types.UserConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
+                following = ink.radiant.web.codegen.types.UserConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
+                posts = PostConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             ),
         )
     }
@@ -171,11 +331,20 @@ class UserDataFetcher {
                 ),
                 createdAt = baseTime.minusDays(index.toLong()),
                 updatedAt = baseTime.minusDays(index.toLong()),
-                likes = (10..100).random(),
+                likesCount = (10..100).random(),
                 commentsCount = (0..20).random(),
                 thumbnailUrl = "https://example.com/thumbnail_${user.id}_$index.jpg",
                 author = user,
-                participants = emptyList(),
+                participants = ink.radiant.web.codegen.types.UserConnection(
+                    edges = emptyList(),
+                    pageInfo = PageInfo(
+                        hasNextPage = false,
+                        hasPreviousPage = false,
+                        startCursor = null,
+                        endCursor = null,
+                    ),
+                    totalCount = 0,
+                ),
             )
         }
     }
