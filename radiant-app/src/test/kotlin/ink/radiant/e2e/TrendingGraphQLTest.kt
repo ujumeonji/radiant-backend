@@ -41,12 +41,24 @@ class TrendingGraphQLTest : BaseGraphQLTest() {
         val query = """
             {
                 trendingPosts {
-                    id
-                    title
-                    body
-                    likes
-                    commentsCount
-                    createdAt
+                    edges {
+                        node {
+                            id
+                            title
+                            body
+                            likesCount
+                            commentsCount
+                            createdAt
+                        }
+                        cursor
+                    }
+                    pageInfo {
+                        hasNextPage
+                        hasPreviousPage
+                        startCursor
+                        endCursor
+                    }
+                    totalCount
                 }
             }
         """.trimIndent()
@@ -54,23 +66,28 @@ class TrendingGraphQLTest : BaseGraphQLTest() {
         executeGraphQLQuery(query)
             .expectStatus().isOk
             .expectBody()
-            .jsonPath("$.data.trendingPosts").isArray
-            .jsonPath("$.data.trendingPosts.length()").isEqualTo(3)
-            .jsonPath("$.data.trendingPosts[0].id").isEqualTo("post-2")
-            .jsonPath("$.data.trendingPosts[0].title").isEqualTo("두 번째 포스트")
-            .jsonPath("$.data.trendingPosts[1].id").isEqualTo("post-3")
-            .jsonPath("$.data.trendingPosts[1].title").isEqualTo("세 번째 포스트")
-            .jsonPath("$.data.trendingPosts[2].id").isEqualTo("post-1")
-            .jsonPath("$.data.trendingPosts[2].title").isEqualTo("첫 번째 포스트")
+            .jsonPath("$.data.trendingPosts.edges").isArray
+            .jsonPath("$.data.trendingPosts.edges.length()").isEqualTo(3)
+            .jsonPath("$.data.trendingPosts.edges[0].node.id").isEqualTo("post-2")
+            .jsonPath("$.data.trendingPosts.edges[0].node.title").isEqualTo("두 번째 포스트")
+            .jsonPath("$.data.trendingPosts.edges[1].node.id").isEqualTo("post-3")
+            .jsonPath("$.data.trendingPosts.edges[1].node.title").isEqualTo("세 번째 포스트")
+            .jsonPath("$.data.trendingPosts.edges[2].node.id").isEqualTo("post-1")
+            .jsonPath("$.data.trendingPosts.edges[2].node.title").isEqualTo("첫 번째 포스트")
     }
 
     @Test
-    fun `trendingPosts 쿼리에서 limit 파라미터가 동작한다`() {
+    fun `trendingPosts 쿼리에서 first 파라미터가 동작한다`() {
         val query = """
             {
-                trendingPosts(limit: 2) {
-                    id
-                    title
+                trendingPosts(first: 2) {
+                    edges {
+                        node {
+                            id
+                            title
+                        }
+                    }
+                    totalCount
                 }
             }
         """.trimIndent()
@@ -78,19 +95,24 @@ class TrendingGraphQLTest : BaseGraphQLTest() {
         executeGraphQLQuery(query)
             .expectStatus().isOk
             .expectBody()
-            .jsonPath("$.data.trendingPosts").isArray
-            .jsonPath("$.data.trendingPosts.length()").isEqualTo(2)
-            .jsonPath("$.data.trendingPosts[0].id").isEqualTo("post-2")
-            .jsonPath("$.data.trendingPosts[1].id").isEqualTo("post-3")
+            .jsonPath("$.data.trendingPosts.edges").isArray
+            .jsonPath("$.data.trendingPosts.edges.length()").isEqualTo(2)
+            .jsonPath("$.data.trendingPosts.edges[0].node.id").isEqualTo("post-2")
+            .jsonPath("$.data.trendingPosts.edges[1].node.id").isEqualTo("post-3")
     }
 
     @Test
-    fun `trendingPosts 쿼리에서 limit이 범위를 벗어나면 조정된다`() {
+    fun `trendingPosts 쿼리에서 first가 큰 값이어도 정상 동작한다`() {
         val query = """
             {
-                trendingPosts(limit: 100) {
-                    id
-                    title
+                trendingPosts(first: 100) {
+                    edges {
+                        node {
+                            id
+                            title
+                        }
+                    }
+                    totalCount
                 }
             }
         """.trimIndent()
@@ -98,8 +120,8 @@ class TrendingGraphQLTest : BaseGraphQLTest() {
         executeGraphQLQuery(query)
             .expectStatus().isOk
             .expectBody()
-            .jsonPath("$.data.trendingPosts").isArray
-            .jsonPath("$.data.trendingPosts.length()").isEqualTo(3)
+            .jsonPath("$.data.trendingPosts.edges").isArray
+            .jsonPath("$.data.trendingPosts.edges.length()").isEqualTo(3)
     }
 
     @Test
@@ -109,8 +131,13 @@ class TrendingGraphQLTest : BaseGraphQLTest() {
         val query = """
             {
                 trendingPosts {
-                    id
-                    title
+                    edges {
+                        node {
+                            id
+                            title
+                        }
+                    }
+                    totalCount
                 }
             }
         """.trimIndent()
@@ -118,7 +145,8 @@ class TrendingGraphQLTest : BaseGraphQLTest() {
         executeGraphQLQuery(query)
             .expectStatus().isOk
             .expectBody()
-            .jsonPath("$.data.trendingPosts").isArray
-            .jsonPath("$.data.trendingPosts.length()").isEqualTo(0)
+            .jsonPath("$.data.trendingPosts.edges").isArray
+            .jsonPath("$.data.trendingPosts.edges.length()").isEqualTo(0)
+            .jsonPath("$.data.trendingPosts.totalCount").isEqualTo(0)
     }
 }
