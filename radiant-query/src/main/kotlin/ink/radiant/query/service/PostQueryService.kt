@@ -51,9 +51,12 @@ class PostQueryService(
             endCursor = edges.lastOrNull()?.cursor,
         )
 
+        val totalCount = postRepository.countExistingPosts().toInt()
+
         return PostConnection(
             edges = edges,
             pageInfo = pageInfo,
+            totalCount = totalCount,
         )
     }
 

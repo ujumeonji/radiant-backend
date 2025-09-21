@@ -22,4 +22,7 @@ interface PostRepository : JpaRepository<PostEntity, String> {
 
     @Query("SELECT p FROM PostEntity p WHERE p.deletedAt IS NULL")
     fun findAllNotDeleted(pageable: Pageable): Page<PostEntity>
+
+    @Query("SELECT COUNT(p) FROM PostEntity p WHERE p.deletedAt IS NULL")
+    fun countExistingPosts(): Long
 }
