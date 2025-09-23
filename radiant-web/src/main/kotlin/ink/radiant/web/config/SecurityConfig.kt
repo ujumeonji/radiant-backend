@@ -27,11 +27,6 @@ class SecurityConfig {
                 .requestMatchers("/health").permitAll()
                 .anyRequest().authenticated()
         }
-        .oauth2Login { oauth2 ->
-            oauth2
-                .authorizationEndpoint { it.baseUri("/api/auth/oauth2/authorization") }
-                .redirectionEndpoint { it.baseUri("/api/auth/oauth2/callback/*") }
-        }
         .build()
 
     @Bean
