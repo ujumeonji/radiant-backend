@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":radiant-core"))
     implementation(project(":radiant-eventstore"))
     implementation(project(":radiant-query"))
+    implementation(project(":radiant-infrastructure"))
 
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-validation")

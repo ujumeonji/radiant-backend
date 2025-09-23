@@ -3,7 +3,7 @@ package ink.radiant.web.datafetcher
 import com.netflix.graphql.dgs.DgsComponent
 import com.netflix.graphql.dgs.DgsQuery
 import com.netflix.graphql.dgs.InputArgument
-import ink.radiant.query.service.TrendingPostService
+import ink.radiant.query.service.TrendingQueryService
 import ink.radiant.web.codegen.types.PageInfo
 import ink.radiant.web.codegen.types.Post
 import ink.radiant.web.codegen.types.PostConnection
@@ -14,13 +14,13 @@ import ink.radiant.web.codegen.types.TopicEdge
 
 @DgsComponent
 class TrendingDataFetcher(
-    private val trendingPostService: TrendingPostService,
+    private val trendingQueryService: TrendingQueryService,
 ) {
 
     @DgsQuery
     fun trendingPosts(@InputArgument first: Int?, @InputArgument after: String?): PostConnection {
         val requestedLimit = first ?: DEFAULT_LIMIT
-        val trendingPosts = trendingPostService.findTrendingPosts(requestedLimit)
+        val trendingPosts = trendingQueryService.findTrendingPosts(requestedLimit)
 
         return PostConnection(
             edges = trendingPosts.mapIndexed { index, post ->
