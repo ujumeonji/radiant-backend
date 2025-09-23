@@ -1,6 +1,6 @@
 package ink.radiant.command.entity
 
-import ink.radiant.query.entity.BaseEntity
+import ink.radiant.infrastructure.share.BaseEntity
 import jakarta.persistence.*
 import java.util.*
 
