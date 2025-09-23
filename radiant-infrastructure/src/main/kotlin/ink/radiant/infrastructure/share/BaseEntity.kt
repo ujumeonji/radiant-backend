@@ -10,20 +10,20 @@ import java.time.OffsetDateTime
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-abstract class BaseEntity {
-
+abstract class BaseEntity(
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
-    var createdAt: OffsetDateTime? = null
+    val createdAt: OffsetDateTime = OffsetDateTime.now(),
 
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: OffsetDateTime? = null
+    val updatedAt: OffsetDateTime = OffsetDateTime.now(),
 
     @Column(name = "deleted_at")
-    var deletedAt: OffsetDateTime? = null
+    var deletedAt: OffsetDateTime? = null,
+) {
 
-    protected constructor()
+    protected constructor() : this(OffsetDateTime.now(), OffsetDateTime.now())
 
     fun softDelete() {
         this.deletedAt = OffsetDateTime.now()
