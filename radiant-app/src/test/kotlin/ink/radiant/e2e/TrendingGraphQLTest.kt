@@ -1,10 +1,10 @@
 package ink.radiant.e2e
 
 import ink.radiant.base.BaseGraphQLTest
+import ink.radiant.command.repository.PostRepository
+import ink.radiant.command.repository.TrendingCommandRepository
 import ink.radiant.fixture.PostEntityFixture
 import ink.radiant.fixture.TrendingEntityFixture
-import ink.radiant.query.repository.PostRepository
-import ink.radiant.query.repository.TrendingRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,7 +18,7 @@ class TrendingGraphQLTest : BaseGraphQLTest() {
     private lateinit var postRepository: PostRepository
 
     @Autowired
-    private lateinit var trendingRepository: TrendingRepository
+    private lateinit var trendingRepository: TrendingCommandRepository
 
     @BeforeEach
     @Transactional

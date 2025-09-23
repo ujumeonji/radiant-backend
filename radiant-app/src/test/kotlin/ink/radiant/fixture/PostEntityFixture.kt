@@ -1,6 +1,6 @@
 package ink.radiant.fixture
 
-import ink.radiant.query.entity.PostEntity
+import ink.radiant.command.entity.PostEntity
 import java.util.UUID
 
 object PostEntityFixture {

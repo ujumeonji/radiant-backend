@@ -1,8 +1,8 @@
 package ink.radiant.e2e
 
 import ink.radiant.base.BaseGraphQLTest
+import ink.radiant.command.repository.PostRepository
 import ink.radiant.fixture.PostEntityFixture
-import ink.radiant.query.repository.PostRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -133,7 +133,7 @@ class PostGraphQLTest : BaseGraphQLTest() {
     fun `삭제된 post는 조회되지 않는다`() {
         // 소프트 삭제 실행
         val postToDelete = postRepository.findById("post-2").orElseThrow()
-        postToDelete.softDelete()
+        postToDelete.markAsDeleted()
         postRepository.save(postToDelete)
 
         val query = """
