@@ -15,7 +15,7 @@ class AccountEntity(
     @Column(unique = true, nullable = false)
     val email: String,
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     val name: String,
 
     @Enumerated(EnumType.STRING)

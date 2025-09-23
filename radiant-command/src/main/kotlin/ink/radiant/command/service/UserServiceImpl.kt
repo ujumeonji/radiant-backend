@@ -3,6 +3,7 @@ package ink.radiant.command.service
 import ink.radiant.command.entity.AccountEntity
 import ink.radiant.command.entity.OAuthProvider
 import ink.radiant.command.repository.AccountRepository
+import ink.radiant.command.repository.ProfileRepository
 import ink.radiant.core.domain.model.OAuthUser
 import ink.radiant.core.domain.model.User
 import ink.radiant.query.service.UserQueryService
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class UserServiceImpl(
     private val accountRepository: AccountRepository,
+    private val profileRepository: ProfileRepository,
 ) : UserCommandService, UserQueryService {
 
     override fun findOrCreateUser(oauthUser: OAuthUser): User {
@@ -56,7 +58,7 @@ class UserServiceImpl(
         var username = baseUsername
         var counter = 1
 
-        while (accountRepository.existsByName(username)) {
+        while (profileRepository.existsByDisplayName(username)) {
             username = "${baseUsername}_$counter"
             counter++
         }

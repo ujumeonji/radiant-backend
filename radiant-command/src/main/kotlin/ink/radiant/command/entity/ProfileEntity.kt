@@ -15,7 +15,7 @@ class ProfileEntity(
     @JoinColumn(name = "account_id", nullable = false)
     val account: AccountEntity,
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     var displayName: String,
 
     @Column(name = "avatar_url")
