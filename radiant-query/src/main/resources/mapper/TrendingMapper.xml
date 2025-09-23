@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ink.radiant.query.mapper.TrendingQueryMapper">
+
+    <resultMap id="TrendingQueryModelResultMap" type="ink.radiant.query.model.TrendingQueryModel">
+        <result property="postId" column="post_id"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="trendScore" column="trend_score"/>
+        <result property="lastViewedAt" column="last_viewed_at"/>
+    </resultMap>
+
+    <select id="findTrendingPostsSince" resultMap="TrendingQueryModelResultMap">
+        SELECT post_id, view_count, trend_score, last_viewed_at
+        FROM trending
+        WHERE last_viewed_at >= #{since} AND deleted_at IS NULL
+        ORDER BY trend_score DESC, last_viewed_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="findAllTrendingPosts" resultMap="TrendingQueryModelResultMap">
+        SELECT post_id, view_count, trend_score, last_viewed_at
+        FROM trending
+        WHERE deleted_at IS NULL
+        ORDER BY trend_score DESC, last_viewed_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="findByPostIdAndNotDeleted" resultMap="TrendingQueryModelResultMap">
+        SELECT post_id, view_count, trend_score, last_viewed_at
+        FROM trending
+        WHERE post_id = #{postId} AND deleted_at IS NULL
+    </select>
+
+</mapper>

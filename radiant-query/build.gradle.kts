@@ -11,6 +11,7 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
 
     runtimeOnly("org.postgresql:postgresql")
     testRuntimeOnly("com.h2database:h2")
