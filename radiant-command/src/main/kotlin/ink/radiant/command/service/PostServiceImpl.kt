@@ -72,6 +72,15 @@ class PostServiceImpl(
         return post
     }
 
+    override fun findPostsByIds(ids: List<String>): List<Post> {
+        if (ids.isEmpty()) {
+            return emptyList()
+        }
+
+        return postQueryMapper.findByIdsAndNotDeleted(ids)
+            .map { it.toDomainModel() }
+    }
+
     private fun encodeCursor(dateTime: OffsetDateTime): String {
         return Base64.getEncoder().encodeToString(dateTime.toString().toByteArray())
     }

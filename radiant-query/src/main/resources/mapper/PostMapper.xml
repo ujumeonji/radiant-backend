@@ -50,4 +50,15 @@
         WHERE deleted_at IS NULL
     </select>
 
+    <select id="findByIdsAndNotDeleted" resultMap="PostQueryModelResultMap">
+        SELECT id, title, body, translated_title, original_sentences, translated_sentences,
+               created_at, updated_at, likes, comments_count, thumbnail_url, author_id, deleted_at
+        FROM posts
+        WHERE deleted_at IS NULL
+        AND id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
 </mapper>

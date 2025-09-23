@@ -15,4 +15,6 @@ interface PostQueryMapper {
     fun findByIdAndNotDeleted(@Param("id") id: String): PostQueryModel?
 
     fun countExistingPosts(): Long
+
+    fun findByIdsAndNotDeleted(@Param("ids") ids: List<String>): List<PostQueryModel>
 }

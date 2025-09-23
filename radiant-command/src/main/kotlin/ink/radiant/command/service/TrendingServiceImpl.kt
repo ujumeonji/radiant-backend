@@ -52,9 +52,7 @@ class TrendingServiceImpl(
             return emptyList()
         }
 
-        return postIds.mapNotNull { postId ->
-            postQueryService.findPostById(postId)
-        }
+        return postQueryService.findPostsByIds(postIds)
     }
 
     private fun createNewTrendingEntity(postId: String): TrendingEntity = TrendingEntity.create(
