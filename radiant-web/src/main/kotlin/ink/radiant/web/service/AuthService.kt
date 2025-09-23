@@ -6,6 +6,7 @@ import ink.radiant.web.dto.*
 import ink.radiant.web.service.oauth.GitHubOAuthService
 import ink.radiant.web.service.oauth.GoogleOAuthService
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
 
@@ -15,6 +16,10 @@ class AuthService(
     private val googleOAuthService: GoogleOAuthService,
     private val jwtService: JwtService,
     private val userCommandService: UserCommandService,
+    @Value("\${jwt.access-token.expiration:3600}")
+    private var accessTokenExpiration: Long = 3600,
+    @Value("\${jwt.refresh-token.expiration:86400}")
+    private var refreshTokenExpiration: Long = 86400,
 ) {
 
     fun getAuthorizationUrl(provider: String): String = when (provider.lowercase()) {
@@ -73,7 +78,7 @@ class AuthService(
             user = oauthUser,
             accessToken = accessToken,
             refreshToken = refreshToken,
-            expiresIn = ACCESS_TOKEN_EXPIRATION,
+            expiresIn = accessTokenExpiration,
         )
     } catch (e: Exception) {
         OAuthLoginResponse(
@@ -95,7 +100,7 @@ class AuthService(
             message = "Token refreshed successfully",
             accessToken = newAccessToken,
             refreshToken = newRefreshToken,
-            expiresIn = REFRESH_TOKEN_EXPIRATION,
+            expiresIn = refreshTokenExpiration,
         )
     } catch (e: Exception) {
         OAuthLoginResponse(
@@ -111,8 +116,6 @@ class AuthService(
 
     companion object {
         private val log = LoggerFactory.getLogger(AuthService::class.java)
-        private const val ACCESS_TOKEN_EXPIRATION = 3600L
-        private const val REFRESH_TOKEN_EXPIRATION = 86400L
         private const val TOKEN_PREFIX = "Bearer "
         private const val EMAIL_DELIMITER = "@"
     }
