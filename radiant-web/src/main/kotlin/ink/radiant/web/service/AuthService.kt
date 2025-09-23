@@ -75,7 +75,14 @@ class AuthService(
         OAuthLoginResponse(
             success = true,
             message = "Login successful",
-            user = oauthUser,
+            user = UserDto(
+                id = user.id,
+                username = user.username,
+                name = user.name,
+                email = user.email,
+                avatarUrl = user.avatarUrl,
+                provider = user.provider,
+            ),
             accessToken = accessToken,
             refreshToken = refreshToken,
             expiresIn = accessTokenExpiration,
