@@ -23,6 +23,8 @@ abstract class BaseEntity {
     @Column(name = "deleted_at")
     var deletedAt: OffsetDateTime? = null
 
+    protected constructor()
+
     fun softDelete() {
         this.deletedAt = OffsetDateTime.now()
     }
