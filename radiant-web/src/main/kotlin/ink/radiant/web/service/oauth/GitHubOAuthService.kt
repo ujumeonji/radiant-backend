@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets
 
 @Service
 class GitHubOAuthService(
-    private val restTemplate: RestTemplate = RestTemplate(),
+    private val restTemplate: RestTemplate,
 ) {
 
     @Value("\${spring.security.oauth2.client.registration.github.client-id}")

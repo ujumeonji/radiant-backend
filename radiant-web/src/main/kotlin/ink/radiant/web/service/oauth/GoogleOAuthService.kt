@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets
 
 @Service
 class GoogleOAuthService(
-    private val restTemplate: RestTemplate = RestTemplate(),
+    private val restTemplate: RestTemplate,
 ) {
 
     @Value("\${spring.security.oauth2.client.registration.google.client-id}")
