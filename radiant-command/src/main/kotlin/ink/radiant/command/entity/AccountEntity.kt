@@ -120,7 +120,7 @@ class AccountEntity(
     }
 
     override fun toString(): String {
-        return "AccountEntity(id=$id, email='$email', username='$name', provider=$provider)"
+        return "AccountEntity(id=$id, email='$email', name='$name', provider=$provider)"
     }
 }
 
