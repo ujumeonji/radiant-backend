@@ -1,9 +1,10 @@
 package ink.radiant.core.domain.model
 
 import java.time.OffsetDateTime
+import java.util.UUID
 
 data class Post(
-    val id: String,
+    val id: UUID,
     val title: String,
     val body: String?,
     val translatedTitle: String?,

@@ -8,10 +8,13 @@
         <result property="viewCount" column="view_count"/>
         <result property="trendScore" column="trend_score"/>
         <result property="lastViewedAt" column="last_viewed_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="deletedAt" column="deleted_at"/>
     </resultMap>
 
     <select id="findTrendingPostsSince" resultMap="TrendingQueryModelResultMap">
-        SELECT post_id, view_count, trend_score, last_viewed_at
+        SELECT post_id, view_count, trend_score, last_viewed_at, created_at, updated_at, deleted_at
         FROM trending
         WHERE last_viewed_at >= #{since} AND deleted_at IS NULL
         ORDER BY trend_score DESC, last_viewed_at DESC
@@ -19,7 +22,7 @@
     </select>
 
     <select id="findAllTrendingPosts" resultMap="TrendingQueryModelResultMap">
-        SELECT post_id, view_count, trend_score, last_viewed_at
+        SELECT post_id, view_count, trend_score, last_viewed_at, created_at, updated_at, deleted_at
         FROM trending
         WHERE deleted_at IS NULL
         ORDER BY trend_score DESC, last_viewed_at DESC
@@ -27,7 +30,7 @@
     </select>
 
     <select id="findByPostIdAndNotDeleted" resultMap="TrendingQueryModelResultMap">
-        SELECT post_id, view_count, trend_score, last_viewed_at
+        SELECT post_id, view_count, trend_score, last_viewed_at, created_at, updated_at, deleted_at
         FROM trending
         WHERE post_id = #{postId} AND deleted_at IS NULL
     </select>

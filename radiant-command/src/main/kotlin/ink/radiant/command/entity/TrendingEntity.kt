@@ -3,6 +3,7 @@ package ink.radiant.command.entity
 import ink.radiant.infrastructure.share.BaseEntity
 import jakarta.persistence.*
 import java.time.OffsetDateTime
+import java.util.UUID
 
 @Entity
 @Table(
@@ -14,6 +15,9 @@ import java.time.OffsetDateTime
 )
 class TrendingEntity(
     @Id
+    @Column(name = "id")
+    var id: String = UUID.randomUUID().toString(),
+
     @Column(name = "post_id")
     var postId: String,
 
@@ -26,6 +30,10 @@ class TrendingEntity(
     @Column(name = "last_viewed_at")
     var lastViewedAt: OffsetDateTime? = null,
 ) : BaseEntity() {
+
+    constructor() : this(
+        postId = "",
+    )
 
     fun incrementView() {
         viewCount++

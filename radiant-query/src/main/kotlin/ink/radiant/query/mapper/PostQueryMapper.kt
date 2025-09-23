@@ -4,7 +4,6 @@ import ink.radiant.query.model.PostQueryModel
 import org.apache.ibatis.annotations.Mapper
 import org.apache.ibatis.annotations.Param
 import java.time.OffsetDateTime
-
 @Mapper
 interface PostQueryMapper {
 

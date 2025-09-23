@@ -67,7 +67,7 @@ class UserServiceImpl(
     }
 
     private fun convertToUser(account: AccountEntity): User = User(
-        id = account.id.toString(),
+        id = account.id,
         username = account.name,
         name = account.displayName,
         email = account.email,

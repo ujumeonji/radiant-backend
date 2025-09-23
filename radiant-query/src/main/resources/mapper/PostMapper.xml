@@ -57,7 +57,7 @@
         WHERE deleted_at IS NULL
         AND id IN
         <foreach item="id" collection="ids" open="(" separator="," close=")">
-            #{id}
+            #{id,jdbcType=VARCHAR}
         </foreach>
     </select>
 

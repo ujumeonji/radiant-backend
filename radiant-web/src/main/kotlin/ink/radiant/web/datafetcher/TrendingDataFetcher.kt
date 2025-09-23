@@ -41,7 +41,7 @@ class TrendingDataFetcher(
 
     private fun ink.radiant.core.domain.model.Post.toGraphQLPost(): Post {
         return Post(
-            id = this.id,
+            id = this.id.toString(),
             title = this.title,
             body = this.body,
             translatedTitle = this.translatedTitle,

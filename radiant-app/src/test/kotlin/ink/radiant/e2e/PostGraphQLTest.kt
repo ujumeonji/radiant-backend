@@ -69,7 +69,7 @@ class PostGraphQLTest : BaseGraphQLTest() {
     fun `단일 post 쿼리가 정상 동작한다`() {
         val query = """
             {
-                post(id: "post-1") {
+                post(id: "00000000-0000-0000-0000-000000000001") {
                     ... on Post {
                         id
                         title
@@ -94,7 +94,7 @@ class PostGraphQLTest : BaseGraphQLTest() {
         executeGraphQLQuery(query)
             .expectStatus().isOk
             .expectBody()
-            .jsonPath("$.data.post.id").isEqualTo("post-1")
+            .jsonPath("$.data.post.id").isEqualTo("00000000-0000-0000-0000-000000000001")
             .jsonPath("$.data.post.title").isEqualTo("첫 번째 포스트")
             .jsonPath("$.data.post.body").isEqualTo("첫 번째 포스트의 내용입니다.")
             .jsonPath("$.data.post.originalSentences[0]").isEqualTo("첫 번째 문장")
@@ -132,7 +132,9 @@ class PostGraphQLTest : BaseGraphQLTest() {
     @Test
     fun `삭제된 post는 조회되지 않는다`() {
         // 소프트 삭제 실행
-        val postToDelete = postRepository.findById("post-2").orElseThrow()
+        val postToDelete = postRepository.findById(
+            "00000000-0000-0000-0000-000000000002",
+        ).orElseThrow()
         postToDelete.markAsDeleted()
         postRepository.save(postToDelete)
 

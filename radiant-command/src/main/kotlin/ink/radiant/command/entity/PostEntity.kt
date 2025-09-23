@@ -2,16 +2,17 @@ package ink.radiant.command.entity
 
 import ink.radiant.infrastructure.share.BaseEntity
 import jakarta.persistence.*
+import java.util.UUID
 
 @Entity
 @Table(name = "posts")
 class PostEntity(
     @Id
     @Column(name = "id")
-    var id: String,
+    var id: String = UUID.randomUUID().toString(),
 
     @Column(name = "title", nullable = false)
-    var title: String,
+    var title: String = "",
 
     @Column(name = "body", columnDefinition = "TEXT")
     var body: String? = null,
@@ -37,6 +38,10 @@ class PostEntity(
     @Column(name = "author_id")
     var authorId: String? = null,
 ) : BaseEntity() {
+
+    constructor() : this(
+        title = "",
+    )
 
     fun markAsDeleted() {
         this.softDelete()

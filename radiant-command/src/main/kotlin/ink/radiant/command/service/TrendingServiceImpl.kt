@@ -47,12 +47,15 @@ class TrendingServiceImpl(
 
         val trendingModels = trendingQueryMapper.findTrendingPostsSince(sevenDaysAgo, validLimit)
 
-        val postIds = trendingModels.map { it.postId }
-        if (postIds.isEmpty()) {
+        val postIdStrings = trendingModels.map { it.postId }
+        if (postIdStrings.isEmpty()) {
             return emptyList()
         }
 
-        return postQueryService.findPostsByIds(postIds)
+        val posts = postQueryService.findPostsByIds(postIdStrings)
+
+        val postMap = posts.associateBy { it.id.toString() }
+        return postIdStrings.mapNotNull { postId -> postMap[postId] }
     }
 
     private fun createNewTrendingEntity(postId: String): TrendingEntity = TrendingEntity.create(
@@ -61,7 +64,7 @@ class TrendingServiceImpl(
 
     private fun calculateScore(trending: TrendingEntity): Double {
         val baseScore = trending.viewCount.toDouble() * BASE_SCORE
-        val timeDecay = calculateTimeDecay(trending.createdAt)
+        val timeDecay = calculateTimeDecay(trending.createdAt ?: OffsetDateTime.now())
 
         return baseScore * timeDecay
     }

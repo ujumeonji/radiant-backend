@@ -34,7 +34,7 @@ object PostEntityFixture {
     fun createPostEntityList(): List<PostEntity> {
         return listOf(
             createPostEntity(
-                id = "post-1",
+                id = "00000000-0000-0000-0000-000000000001",
                 title = "첫 번째 포스트",
                 body = "첫 번째 포스트의 내용입니다.",
                 translatedTitle = "First Post",
@@ -46,7 +46,7 @@ object PostEntityFixture {
                 authorId = "author-1",
             ),
             createPostEntity(
-                id = "post-2",
+                id = "00000000-0000-0000-0000-000000000002",
                 title = "두 번째 포스트",
                 body = "두 번째 포스트의 내용입니다.",
                 translatedTitle = "Second Post",
@@ -58,7 +58,7 @@ object PostEntityFixture {
                 authorId = "author-2",
             ),
             createPostEntity(
-                id = "post-3",
+                id = "00000000-0000-0000-0000-000000000003",
                 title = "세 번째 포스트",
                 body = "세 번째 포스트의 내용입니다.",
                 translatedTitle = "Third Post",

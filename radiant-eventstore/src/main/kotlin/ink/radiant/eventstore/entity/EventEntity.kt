@@ -16,8 +16,7 @@ import java.util.UUID
 )
 class EventEntity(
     @Id
-    @Column(columnDefinition = "UUID")
-    val eventId: UUID,
+    val id: String = UUID.randomUUID().toString(),
 
     @Column(nullable = false)
     val aggregateId: String,
@@ -41,7 +40,7 @@ class EventEntity(
     val eventVersion: Int = 1,
 ) {
     constructor() : this(
-        eventId = UUID.randomUUID(),
+        id = UUID.randomUUID().toString(),
         aggregateId = "",
         eventType = "",
         version = 0,

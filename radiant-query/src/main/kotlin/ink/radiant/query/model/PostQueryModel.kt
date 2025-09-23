@@ -2,6 +2,7 @@ package ink.radiant.query.model
 
 import ink.radiant.core.domain.model.Post
 import java.time.OffsetDateTime
+import java.util.UUID
 
 data class PostQueryModel(
     val id: String,
@@ -20,7 +21,7 @@ data class PostQueryModel(
 ) {
     fun toDomainModel(): Post {
         return Post(
-            id = this.id,
+            id = UUID.fromString(this.id),
             title = this.title,
             body = this.body,
             translatedTitle = this.translatedTitle,
