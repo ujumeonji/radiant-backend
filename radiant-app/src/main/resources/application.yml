@@ -19,3 +19,31 @@ spring:
     jpa:
       repositories:
         bootstrap-mode: default
+
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID:your-github-client-id}
+            client-secret: ${GITHUB_CLIENT_SECRET:your-github-client-secret}
+            redirect-uri: ${GITHUB_REDIRECT_URI:http://localhost:8080/api/auth/oauth2/callback/github}
+            scope:
+              - user:email
+            authorization-grant-type: authorization_code
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:your-google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:your-google-client-secret}
+            redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:8080/api/auth/oauth2/callback/google}
+            scope:
+              - openid
+              - profile
+              - email
+            authorization-grant-type: authorization_code
+
+jwt:
+  secret: ${JWT_SECRET:your-very-secure-jwt-secret-key-that-should-be-at-least-256-bits}
+  access-token:
+    expiration: 3600  # 1 hour in seconds
+  refresh-token:
+    expiration: 86400  # 24 hours in seconds
