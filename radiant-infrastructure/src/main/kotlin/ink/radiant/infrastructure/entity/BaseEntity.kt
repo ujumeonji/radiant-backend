@@ -1,6 +1,8 @@
-package ink.radiant.query.entity
+package ink.radiant.infrastructure.entity
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.EntityListeners
+import jakarta.persistence.MappedSuperclass
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
@@ -20,6 +22,8 @@ abstract class BaseEntity {
 
     @Column(name = "deleted_at")
     var deletedAt: OffsetDateTime? = null
+
+    constructor()
 
     fun softDelete() {
         this.deletedAt = OffsetDateTime.now()

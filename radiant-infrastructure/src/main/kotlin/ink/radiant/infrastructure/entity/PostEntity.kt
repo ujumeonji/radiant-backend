@@ -1,41 +1,50 @@
-package ink.radiant.query.entity
+package ink.radiant.infrastructure.entity
 
 import jakarta.persistence.*
+import java.util.UUID
 
 @Entity
 @Table(name = "posts")
 class PostEntity(
     @Id
     @Column(name = "id")
-    val id: String,
+    var id: String = UUID.randomUUID().toString(),
 
     @Column(name = "title", nullable = false)
-    val title: String,
+    var title: String = "",
 
     @Column(name = "body", columnDefinition = "TEXT")
-    val body: String? = null,
+    var body: String? = null,
 
     @Column(name = "translated_title")
-    val translatedTitle: String? = null,
+    var translatedTitle: String? = null,
 
-    @Column(name = "original_sentences")
-    val originalSentences: String = "",
+    @Column(name = "original_sentences", columnDefinition = "TEXT")
+    var originalSentences: String = "",
 
-    @Column(name = "translated_sentences")
-    val translatedSentences: String = "",
+    @Column(name = "translated_sentences", columnDefinition = "TEXT")
+    var translatedSentences: String = "",
 
     @Column(name = "likes", nullable = false)
-    val likes: Int = 0,
+    var likes: Int = 0,
 
     @Column(name = "comments_count", nullable = false)
-    val commentsCount: Int = 0,
+    var commentsCount: Int = 0,
 
     @Column(name = "thumbnail_url")
-    val thumbnailUrl: String? = null,
+    var thumbnailUrl: String? = null,
 
     @Column(name = "author_id")
-    val authorId: String? = null,
+    var authorId: String? = null,
 ) : BaseEntity() {
+
+    constructor() : this(
+        title = "",
+    )
+
+    fun markAsDeleted() {
+        this.softDelete()
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

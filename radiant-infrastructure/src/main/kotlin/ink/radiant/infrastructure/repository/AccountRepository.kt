@@ -1,13 +1,12 @@
-package ink.radiant.command.repository
+package ink.radiant.infrastructure.repository
 
-import ink.radiant.command.entity.AccountEntity
-import ink.radiant.command.entity.OAuthProvider
+import ink.radiant.infrastructure.entity.AccountEntity
+import ink.radiant.infrastructure.entity.OAuthProvider
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
-interface AccountRepository : CrudRepository<AccountEntity, UUID> {
+interface AccountRepository : CrudRepository<AccountEntity, String> {
 
     fun findByProviderIdAndProvider(providerId: String, provider: OAuthProvider): AccountEntity?
 

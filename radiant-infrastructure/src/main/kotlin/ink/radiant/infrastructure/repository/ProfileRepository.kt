@@ -1,12 +1,11 @@
-package ink.radiant.command.repository
+package ink.radiant.infrastructure.repository
 
-import ink.radiant.command.entity.ProfileEntity
+import ink.radiant.infrastructure.entity.ProfileEntity
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
-interface ProfileRepository : CrudRepository<ProfileEntity, UUID> {
+interface ProfileRepository : CrudRepository<ProfileEntity, String> {
 
     fun existsByDisplayName(displayName: String): Boolean
 }

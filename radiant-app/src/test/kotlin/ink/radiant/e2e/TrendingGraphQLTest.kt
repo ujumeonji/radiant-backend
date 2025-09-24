@@ -3,11 +3,13 @@ package ink.radiant.e2e
 import ink.radiant.base.BaseGraphQLTest
 import ink.radiant.fixture.PostEntityFixture
 import ink.radiant.fixture.TrendingEntityFixture
-import ink.radiant.query.repository.PostRepository
-import ink.radiant.query.repository.TrendingRepository
+import ink.radiant.infrastructure.mapper.TrendingQueryMapper
+import ink.radiant.infrastructure.repository.PostRepository
+import ink.radiant.infrastructure.repository.TrendingCommandRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.annotation.Commit
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.transaction.annotation.Transactional
 
@@ -18,10 +20,14 @@ class TrendingGraphQLTest : BaseGraphQLTest() {
     private lateinit var postRepository: PostRepository
 
     @Autowired
-    private lateinit var trendingRepository: TrendingRepository
+    private lateinit var trendingRepository: TrendingCommandRepository
+
+    @Autowired
+    private lateinit var trendingQueryMapper: TrendingQueryMapper
 
     @BeforeEach
     @Transactional
+    @Commit
     fun setUp() {
         postRepository.deleteAll()
         trendingRepository.deleteAll()
@@ -31,9 +37,11 @@ class TrendingGraphQLTest : BaseGraphQLTest() {
     private fun setupTestData() {
         val testPosts = PostEntityFixture.createPostEntityList()
         postRepository.saveAll(testPosts)
+        postRepository.flush()
 
         val testTrending = TrendingEntityFixture.createTrendingEntityList()
         trendingRepository.saveAll(testTrending)
+        trendingRepository.flush()
     }
 
     @Test
@@ -68,11 +76,11 @@ class TrendingGraphQLTest : BaseGraphQLTest() {
             .expectBody()
             .jsonPath("$.data.trendingPosts.edges").isArray
             .jsonPath("$.data.trendingPosts.edges.length()").isEqualTo(3)
-            .jsonPath("$.data.trendingPosts.edges[0].node.id").isEqualTo("post-2")
+            .jsonPath("$.data.trendingPosts.edges[0].node.id").isEqualTo("00000000-0000-0000-0000-000000000002")
             .jsonPath("$.data.trendingPosts.edges[0].node.title").isEqualTo("두 번째 포스트")
-            .jsonPath("$.data.trendingPosts.edges[1].node.id").isEqualTo("post-3")
+            .jsonPath("$.data.trendingPosts.edges[1].node.id").isEqualTo("00000000-0000-0000-0000-000000000003")
             .jsonPath("$.data.trendingPosts.edges[1].node.title").isEqualTo("세 번째 포스트")
-            .jsonPath("$.data.trendingPosts.edges[2].node.id").isEqualTo("post-1")
+            .jsonPath("$.data.trendingPosts.edges[2].node.id").isEqualTo("00000000-0000-0000-0000-000000000001")
             .jsonPath("$.data.trendingPosts.edges[2].node.title").isEqualTo("첫 번째 포스트")
     }
 
@@ -97,8 +105,8 @@ class TrendingGraphQLTest : BaseGraphQLTest() {
             .expectBody()
             .jsonPath("$.data.trendingPosts.edges").isArray
             .jsonPath("$.data.trendingPosts.edges.length()").isEqualTo(2)
-            .jsonPath("$.data.trendingPosts.edges[0].node.id").isEqualTo("post-2")
-            .jsonPath("$.data.trendingPosts.edges[1].node.id").isEqualTo("post-3")
+            .jsonPath("$.data.trendingPosts.edges[0].node.id").isEqualTo("00000000-0000-0000-0000-000000000002")
+            .jsonPath("$.data.trendingPosts.edges[1].node.id").isEqualTo("00000000-0000-0000-0000-000000000003")
     }
 
     @Test

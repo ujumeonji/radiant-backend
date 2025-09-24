@@ -1,11 +1,11 @@
 package ink.radiant.command.service
 
-import ink.radiant.command.entity.AccountEntity
-import ink.radiant.command.entity.OAuthProvider
-import ink.radiant.command.repository.AccountRepository
-import ink.radiant.command.repository.ProfileRepository
 import ink.radiant.core.domain.model.OAuthUser
 import ink.radiant.core.domain.model.User
+import ink.radiant.infrastructure.entity.AccountEntity
+import ink.radiant.infrastructure.entity.OAuthProvider
+import ink.radiant.infrastructure.repository.AccountRepository
+import ink.radiant.infrastructure.repository.ProfileRepository
 import ink.radiant.query.service.UserQueryService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -67,7 +67,7 @@ class UserServiceImpl(
     }
 
     private fun convertToUser(account: AccountEntity): User = User(
-        id = account.id.toString(),
+        id = account.id,
         username = account.name,
         name = account.displayName,
         email = account.email,

@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  flyway:
+    enabled: false
+
+jwt:
+  secret: test-jwt-secret-key-for-testing-purposes-only
+  access-token:
+    expiration: 3600
+  refresh-token:
+    expiration: 86400
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: ink.radiant.query.model
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    ink.radiant: DEBUG

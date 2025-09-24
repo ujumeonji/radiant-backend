@@ -1,6 +1,6 @@
 package ink.radiant.fixture
 
-import ink.radiant.query.entity.TrendingEntity
+import ink.radiant.infrastructure.entity.TrendingEntity
 import java.time.OffsetDateTime
 
 object TrendingEntityFixture {
@@ -23,19 +23,19 @@ object TrendingEntityFixture {
         val now = OffsetDateTime.now()
         return listOf(
             createTrendingEntity(
-                postId = "post-1",
+                postId = "00000000-0000-0000-0000-000000000001",
                 viewCount = 50,
                 trendScore = 25.0,
                 lastViewedAt = now.minusHours(1),
             ),
             createTrendingEntity(
-                postId = "post-2",
+                postId = "00000000-0000-0000-0000-000000000002",
                 viewCount = 100,
                 trendScore = 40.0,
                 lastViewedAt = now.minusHours(2),
             ),
             createTrendingEntity(
-                postId = "post-3",
+                postId = "00000000-0000-0000-0000-000000000003",
                 viewCount = 75,
                 trendScore = 35.0,
                 lastViewedAt = now.minusHours(3),

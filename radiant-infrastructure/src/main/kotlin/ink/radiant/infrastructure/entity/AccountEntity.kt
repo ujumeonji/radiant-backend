@@ -1,16 +1,14 @@
-package ink.radiant.command.entity
+package ink.radiant.infrastructure.entity
 
-import ink.radiant.query.entity.BaseEntity
 import jakarta.persistence.*
 import java.time.OffsetDateTime
-import java.util.*
+import java.util.UUID
 
 @Entity
 @Table(name = "accounts")
 class AccountEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID = UUID.randomUUID(),
+    val id: String = UUID.randomUUID().toString(),
 
     @Column(unique = true, nullable = false)
     val email: String,
@@ -115,9 +113,7 @@ class AccountEntity(
         return id == other.id
     }
 
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
+    override fun hashCode(): Int = id.hashCode()
 
     override fun toString(): String {
         return "AccountEntity(id=$id, email='$email', name='$name', provider=$provider)"

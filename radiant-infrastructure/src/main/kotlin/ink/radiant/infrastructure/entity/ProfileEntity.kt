@@ -1,15 +1,13 @@
-package ink.radiant.command.entity
+package ink.radiant.infrastructure.entity
 
-import ink.radiant.query.entity.BaseEntity
 import jakarta.persistence.*
-import java.util.*
+import java.util.UUID
 
 @Entity
 @Table(name = "profiles")
 class ProfileEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID = UUID.randomUUID(),
+    val id: String = UUID.randomUUID().toString(),
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
@@ -120,9 +118,7 @@ class ProfileEntity(
         return id == other.id
     }
 
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
+    override fun hashCode(): Int = id.hashCode()
 
     override fun toString(): String {
         return "ProfileEntity(id=$id, displayName='$displayName', account=${account.name})"

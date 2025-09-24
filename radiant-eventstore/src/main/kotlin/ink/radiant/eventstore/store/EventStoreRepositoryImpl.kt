@@ -10,10 +10,9 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
 
 @Repository
-interface EventEntityRepository : JpaRepository<EventEntity, UUID> {
+interface EventEntityRepository : JpaRepository<EventEntity, String> {
     fun findByAggregateIdOrderByVersionAsc(aggregateId: String): List<EventEntity>
 
     fun findByAggregateIdAndVersionGreaterThanOrderByVersionAsc(aggregateId: String, version: Long): List<EventEntity>
@@ -46,7 +45,7 @@ class EventStoreRepositoryImpl(
         try {
             val eventEntities = events.mapIndexed { index, event ->
                 EventEntity(
-                    eventId = event.eventId,
+                    id = event.eventId.toString(),
                     aggregateId = aggregateId,
                     eventType = event.eventType,
                     version = expectedVersion + index + 1,
