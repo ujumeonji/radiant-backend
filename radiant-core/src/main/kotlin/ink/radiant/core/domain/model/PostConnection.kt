@@ -10,10 +10,3 @@ data class PostEdge(
     val post: Post,
     val cursor: String,
 )
-
-data class PageInfo(
-    val hasNextPage: Boolean,
-    val hasPreviousPage: Boolean,
-    val startCursor: String?,
-    val endCursor: String?,
-)
