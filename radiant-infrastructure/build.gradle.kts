@@ -14,6 +14,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
+    implementation(platform("org.springframework.ai:spring-ai-bom:1.0.2"))
+    implementation("org.springframework.ai:spring-ai-starter-model-openai")
     runtimeOnly("org.postgresql:postgresql")
 
     compileOnly("org.springframework.kafka:spring-kafka")
