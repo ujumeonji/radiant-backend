@@ -1,44 +1,60 @@
 package ink.radiant.web.config
 
+import ink.radiant.web.security.AdminTokenAuthenticationFilter
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.web.cors.CorsConfiguration
-import org.springframework.web.cors.CorsConfigurationSource
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig {
+class SecurityConfig(
+    @Value("\${radiant.security.admin-tokens:test-admin-token}") private val adminTokensProperty: String,
+) {
 
     @Bean
-    fun filterChain(http: HttpSecurity): SecurityFilterChain = http
-        .csrf { it.disable() }
-        .cors { it.configurationSource(corsConfigurationSource()) }
-        .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-        .authorizeHttpRequests { authorize ->
-            authorize
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/graphql").permitAll()
-                .requestMatchers("/graphiql").permitAll()
-                .requestMatchers("/health").permitAll()
-                .anyRequest().authenticated()
-        }
-        .build()
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+        val adminTokens = parseTokens(adminTokensProperty)
 
-    @Bean
-    fun corsConfigurationSource(): CorsConfigurationSource {
-        val configuration = CorsConfiguration()
-        configuration.allowedOriginPatterns = listOf("https://www.radiant.ink")
-        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
-        configuration.allowedHeaders = listOf("*")
-        configuration.allowCredentials = true
+        http
+            .cors { }
+            .csrf { it.disable() }
+            .httpBasic { it.disable() }
+            .formLogin { it.disable() }
+            .logout { it.disable() }
+            .sessionManagement { manager ->
+                manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            }
+            .authorizeHttpRequests { registry ->
+                registry
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/graphql", "/graphiql", "/vendor/**").permitAll()
+                    .anyRequest().permitAll()
+            }
+            .addFilterBefore(
+                AdminTokenAuthenticationFilter(adminTokens, ADMIN_ROLE),
+                UsernamePasswordAuthenticationFilter::class.java,
+            )
 
-        val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", configuration)
-        return source
+        return http.build()
+    }
+
+    private fun parseTokens(rawTokens: String): Set<String> {
+        return rawTokens.split(",")
+            .map(String::trim)
+            .filter { it.isNotEmpty() }
+            .toSet()
+            .ifEmpty { setOf(DEFAULT_ADMIN_TOKEN) }
+    }
+
+    companion object {
+        private const val DEFAULT_ADMIN_TOKEN = "test-admin-token"
+        private const val ADMIN_ROLE = "ROLE_ADMIN"
     }
 }
