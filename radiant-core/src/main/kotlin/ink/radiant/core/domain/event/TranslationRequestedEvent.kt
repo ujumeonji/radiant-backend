@@ -1,6 +1,7 @@
 package ink.radiant.core.domain.event
 
 import ink.radiant.core.domain.model.Language
+import ink.radiant.core.domain.model.LanguageCode
 import ink.radiant.core.domain.model.TranslationSessionId
 import java.time.Instant
 import java.util.UUID
@@ -11,6 +12,8 @@ data class TranslationRequestedEvent(
     val sourceLanguage: Language,
     val sourceText: String,
     val textLength: Int,
+    val targetLanguage: LanguageCode,
+    val preserveFormatting: Boolean,
     val requestedAt: Instant = Instant.now(),
     override val eventId: UUID = UUID.randomUUID(),
     override val aggregateId: String = sessionId.value,

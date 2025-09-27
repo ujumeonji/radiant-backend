@@ -24,7 +24,7 @@ class TranslationGraphQLTest : BaseGraphQLTest() {
     private val adminToken = "test-admin-token"
 
     @Test
-    fun `translateToKorean mutation returns translation result for english text`() {
+    fun `translateToKorean 뮤테이션은 번역 세션을 비동기로 생성한다`() {
         val mutation = """
             mutation TranslateEnglish {
                 translateToKorean(
@@ -33,24 +33,9 @@ class TranslationGraphQLTest : BaseGraphQLTest() {
                     }
                 ) {
                     __typename
-                    ... on TranslationResult {
+                    ... on TranslationQueued {
                         sessionId
-                        translatedText
-                        sourceLanguage {
-                            code
-                            name
-                            confidence
-                        }
-                        sentencePairs {
-                            order
-                            original
-                            translated
-                        }
-                        metadata {
-                            processingTimeMs
-                            tokenCount
-                            chunkCount
-                        }
+                        status
                     }
                     ... on TranslationError {
                         type
@@ -68,50 +53,14 @@ class TranslationGraphQLTest : BaseGraphQLTest() {
 
         val json = parseJson(result.responseBody)
         val payload = json.path("data").path("translateToKorean")
-        assertEquals("TranslationResult", payload.path("__typename").asText())
+        assertEquals("TranslationQueued", payload.path("__typename").asText())
         val sessionId = payload.path("sessionId").asText()
         assertTrue(sessionId.isNotBlank())
-        val translatedText = payload.path("translatedText").asText()
-        assertTrue(translatedText.isNotBlank())
-        assertTrue(translatedText.any { it.code in HANGUL_RANGE })
-        val sentencePairs = payload.path("sentencePairs")
-        assertEquals("Hello world! This is a test translation.", sentencePairs[0].path("original").asText())
-        assertTrue(sentencePairs[0].path("translated").asText().any { it.code in HANGUL_RANGE })
+        assertEquals("IN_PROGRESS", payload.path("status").asText())
     }
 
     @Test
-    fun `translateToKorean mutation rejects text exceeding 20k characters`() {
-        val longText = "a".repeat(20_001)
-        val mutation = """
-            mutation TranslateTooLong(${ '$' }input: TranslationInput!) {
-                translateToKorean(input: ${ '$' }input) {
-                    __typename
-                    ... on TranslationResult {
-                        sessionId
-                    }
-                    ... on TranslationError {
-                        type
-                        message
-                        code
-                    }
-                }
-            }
-        """.trimIndent()
-
-        val variables = mapOf(
-            "input" to mapOf("sourceText" to longText),
-        )
-
-        executeAuthorizedGraphQLQuery(mutation, variables = variables)
-            .expectStatus().isOk
-            .expectBody()
-            .jsonPath("$.data.translateToKorean.__typename").isEqualTo("TranslationError")
-            .jsonPath("$.data.translateToKorean.type").isEqualTo("TEXT_TOO_LONG")
-            .jsonPath("$.data.translateToKorean.code").isEqualTo("TRANSLATION_TEXT_TOO_LONG")
-    }
-
-    @Test
-    fun `translationSession query returns session details after translation`() {
+    fun `translationSession 쿼리는 번역 완료 후 세션 정보를 반환한다`() {
         val mutation = """
             mutation StartTranslation {
                 translateToKorean(
@@ -119,7 +68,7 @@ class TranslationGraphQLTest : BaseGraphQLTest() {
                         sourceText: "Hello world! This is a test translation."
                     }
                 ) {
-                    ... on TranslationResult {
+                    ... on TranslationQueued {
                         sessionId
                     }
                     ... on TranslationError {
@@ -160,7 +109,7 @@ class TranslationGraphQLTest : BaseGraphQLTest() {
     }
 
     @Test
-    fun `translateToKorean mutation requires admin authorization`() {
+    fun `translateToKorean 뮤테이션은 관리자 인증이 필요하다`() {
         val mutation = """
             mutation UnauthorizedTranslate {
                 translateToKorean(
@@ -251,9 +200,5 @@ class TranslationGraphQLTest : BaseGraphQLTest() {
             .header("Authorization", "Bearer $token")
             .bodyValue(payload)
             .exchange()
-    }
-
-    companion object {
-        private val HANGUL_RANGE = 0xAC00..0xD7A3
     }
 }

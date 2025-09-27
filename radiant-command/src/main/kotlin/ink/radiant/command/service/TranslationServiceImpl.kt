@@ -7,6 +7,7 @@ import ink.radiant.core.domain.event.TranslationRequestedEvent
 import ink.radiant.core.domain.exception.TranslationException
 import ink.radiant.core.domain.exception.TranslationUnknownException
 import ink.radiant.core.domain.model.Language
+import ink.radiant.core.domain.model.LanguageCode
 import ink.radiant.core.domain.model.SentencePair
 import ink.radiant.core.domain.model.TranslationErrorType
 import ink.radiant.core.domain.model.TranslationMetadata
@@ -23,12 +24,12 @@ import ink.radiant.infrastructure.entity.toResult
 import ink.radiant.infrastructure.messaging.EventPublisher
 import ink.radiant.infrastructure.repository.TranslationSessionRepository
 import ink.radiant.query.service.TranslationQueryService
-import org.springframework.beans.factory.annotation.Qualifier
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionOperations
 import java.time.Instant
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Executor
 
 @Service
 @Transactional
@@ -37,38 +38,36 @@ class TranslationServiceImpl(
     private val languageDetectionService: LanguageDetectionService,
     private val translationModelClient: TranslationModelClient,
     private val translationSessionRepository: TranslationSessionRepository,
-    @Qualifier("translationTaskExecutor") private val translationExecutor: Executor,
-) : TranslationCommandService, TranslationQueryService {
+    private val transactionTemplate: TransactionOperations,
+) : TranslationCommandService, TranslationQueryService, TranslationProcessingService {
 
-    override fun requestTranslation(command: RequestTranslationCommand): CompletableFuture<TranslationResult> {
+    private val log = LoggerFactory.getLogger(TranslationServiceImpl::class.java)
+
+    override fun requestTranslation(command: RequestTranslationCommand): TranslationSessionId {
         val sessionId = TranslationSessionId.generate()
         val detectedLanguage = languageDetectionService.detectLanguage(command.sourceText, command.sourceLanguageHint)
         val requestedAt = Instant.now()
 
-        val sessionEntity = TranslationSessionEntity.create(
+        val translationSession = TranslationSessionEntity.create(
             sessionId = sessionId,
             userId = command.userId,
             language = detectedLanguage,
             sourceText = command.sourceText,
             requestedAt = requestedAt,
         )
-        translationSessionRepository.save(sessionEntity)
+        translationSessionRepository.save(translationSession)
 
         publishRequestedEvent(
-            sessionId = sessionEntity.id,
+            sessionId = translationSession.id,
             userId = command.userId,
             language = detectedLanguage,
             sourceText = command.sourceText,
             requestedAt = requestedAt,
+            targetLanguage = command.targetLanguage,
+            preserveFormatting = command.preserveFormatting,
         )
 
-        return CompletableFuture.supplyAsync({
-            handleTranslation(
-                sessionId = sessionId,
-                command = command,
-                detectedLanguage = detectedLanguage,
-            )
-        }, translationExecutor)
+        return sessionId
     }
 
     override fun getTranslationSession(sessionId: String): TranslationSession? {
@@ -77,40 +76,48 @@ class TranslationServiceImpl(
             .orElse(null)
     }
 
-    private fun handleTranslation(
-        sessionId: TranslationSessionId,
-        command: RequestTranslationCommand,
-        detectedLanguage: Language,
-    ): TranslationResult {
-        return try {
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    override fun processTranslation(event: TranslationRequestedEvent) {
+        val sessionId = event.sessionId
+        log.info("Translating session {}", sessionId.value)
+        try {
             val response = translationModelClient.translate(
                 TranslationModelRequest(
                     sessionId = sessionId.value,
-                    sourceLanguage = detectedLanguage.code,
-                    targetLanguage = command.targetLanguage,
-                    sourceText = command.sourceText,
-                    preserveFormatting = command.preserveFormatting,
+                    sourceLanguage = event.sourceLanguage.code,
+                    targetLanguage = event.targetLanguage,
+                    sourceText = event.sourceText,
+                    preserveFormatting = event.preserveFormatting,
                 ),
             )
 
-            markCompletion(
-                sessionId = sessionId,
-                translatedText = response.translatedText,
-                pairs = response.sentencePairs,
-                metadata = response.metadata,
-                completedAt = Instant.now(),
-            )
+            transactionTemplate.executeWithoutResult {
+                markCompletion(
+                    sessionId = sessionId,
+                    translatedText = response.translatedText,
+                    pairs = response.sentencePairs,
+                    metadata = response.metadata,
+                    completedAt = Instant.now(),
+                )
+            }
+            log.info("Translation completed for session {}", sessionId.value)
         } catch (exception: TranslationProviderException) {
             val translationException = exception.toTranslationException()
-            markFailure(sessionId, translationException)
-            throw translationException
+            transactionTemplate.executeWithoutResult {
+                markFailure(sessionId, translationException)
+            }
+            log.warn("Translation provider failure for session {}", sessionId.value, translationException)
         } catch (exception: TranslationException) {
-            markFailure(sessionId, exception)
-            throw exception
+            transactionTemplate.executeWithoutResult {
+                markFailure(sessionId, exception)
+            }
+            log.warn("Translation failure for session {}", sessionId.value, exception)
         } catch (exception: Exception) {
             val failure = TranslationUnknownException(cause = exception)
-            markFailure(sessionId, failure)
-            throw failure
+            transactionTemplate.executeWithoutResult {
+                markFailure(sessionId, failure)
+            }
+            log.error("Unexpected translation error for session {}", sessionId.value, failure)
         }
     }
 
@@ -128,8 +135,8 @@ class TranslationServiceImpl(
             metadata = metadata,
             completedAt = completedAt,
         )
-
         translationSessionRepository.save(session)
+
         publishCompletedEvent(
             sessionId = sessionId,
             translatedText = translatedText,
@@ -169,6 +176,8 @@ class TranslationServiceImpl(
         language: Language,
         sourceText: String,
         requestedAt: Instant,
+        targetLanguage: LanguageCode,
+        preserveFormatting: Boolean,
     ) {
         val event = TranslationRequestedEvent(
             sessionId = TranslationSessionId.from(sessionId),
@@ -177,6 +186,8 @@ class TranslationServiceImpl(
             sourceText = sourceText,
             textLength = sourceText.length,
             requestedAt = requestedAt,
+            targetLanguage = targetLanguage,
+            preserveFormatting = preserveFormatting,
         )
         eventPublisher.publish(event)
     }
