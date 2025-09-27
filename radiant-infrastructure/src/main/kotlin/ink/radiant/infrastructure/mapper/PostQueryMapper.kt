@@ -1,6 +1,6 @@
 package ink.radiant.infrastructure.mapper
 
-import ink.radiant.infrastructure.model.PostQueryModel
+import ink.radiant.infrastructure.view.PostQueryModel
 import org.apache.ibatis.annotations.Mapper
 import org.apache.ibatis.annotations.Param
 import java.time.OffsetDateTime

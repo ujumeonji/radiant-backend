@@ -1,4 +1,4 @@
-package ink.radiant.query.handler
+package ink.radiant.eventstore.handler
 
 import ink.radiant.core.domain.event.DomainEvent
 

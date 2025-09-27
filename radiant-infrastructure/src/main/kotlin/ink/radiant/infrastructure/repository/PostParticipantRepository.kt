@@ -1,6 +1,6 @@
 package ink.radiant.infrastructure.repository
 
-import ink.radiant.infrastructure.entity.PostParticipantEntity
+import ink.radiant.core.domain.entity.PostParticipantEntity
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query

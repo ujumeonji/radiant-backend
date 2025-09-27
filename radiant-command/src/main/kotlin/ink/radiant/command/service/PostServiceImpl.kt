@@ -1,5 +1,7 @@
 package ink.radiant.command.service
 
+import ink.radiant.core.domain.entity.PostEntity
+import ink.radiant.core.domain.entity.PostParticipantEntity
 import ink.radiant.core.domain.event.PostViewedEvent
 import ink.radiant.core.domain.model.PageInfo
 import ink.radiant.core.domain.model.Post
@@ -9,11 +11,12 @@ import ink.radiant.core.domain.model.PostEdge
 import ink.radiant.core.domain.model.PostParticipant
 import ink.radiant.core.domain.model.PostParticipantConnection
 import ink.radiant.core.domain.model.PostParticipantEdge
-import ink.radiant.infrastructure.entity.PostParticipantEntity
+import ink.radiant.core.domain.repository.EventStoreRepository
 import ink.radiant.infrastructure.mapper.PostQueryMapper
 import ink.radiant.infrastructure.messaging.EventPublisher
 import ink.radiant.infrastructure.repository.AccountRepository
 import ink.radiant.infrastructure.repository.PostParticipantRepository
+import ink.radiant.infrastructure.repository.PostRepository
 import ink.radiant.query.service.PostQueryService
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -25,12 +28,69 @@ import java.util.Base64
 @Service
 @Transactional
 class PostServiceImpl(
-    private val postQueryMapper: PostQueryMapper,
+    private val postRepository: PostRepository,
     private val eventPublisher: EventPublisher,
+    private val eventStoreRepository: EventStoreRepository,
+    private val postQueryMapper: PostQueryMapper,
     private val postParticipantRepository: PostParticipantRepository,
     private val accountRepository: AccountRepository,
 ) : PostCommandService, PostQueryService {
 
+    override fun createPost(title: String, body: String?, authorId: String, thumbnailUrl: String?): PostEntity {
+        val post = PostEntity.create(title, body, authorId, thumbnailUrl)
+
+        val savedPost = postRepository.save(post)
+
+        eventPublisher.publishAll(post)
+
+        return savedPost
+    }
+
+    override fun updatePost(postId: String, title: String?, body: String?, updatedBy: String): PostEntity {
+        val post = postRepository.findById(postId)
+            .orElseThrow { IllegalArgumentException("게시글을 찾을 수 없습니다: $postId") }
+
+        require(post.canBeEditedBy(updatedBy)) { "게시글을 수정할 권한이 없습니다." }
+
+        title?.let { post.updateTitle(it, updatedBy) }
+        body?.let { post.updateBody(it, updatedBy) }
+
+        val savedPost = postRepository.save(post)
+
+        eventPublisher.publishAll(post)
+
+        return savedPost
+    }
+
+    override fun deletePost(postId: String, deletedBy: String) {
+        val post = postRepository.findById(postId)
+            .orElseThrow { IllegalArgumentException("게시글을 찾을 수 없습니다: $postId") }
+
+        require(post.canBeDeletedBy(deletedBy)) { "게시글을 삭제할 권한이 없습니다." }
+
+        post.markAsDeleted(deletedBy)
+
+        postRepository.save(post)
+
+        eventPublisher.publishAll(post)
+    }
+
+    override fun likePost(postId: String, likedBy: String): PostEntity {
+        val post = postRepository.findById(postId)
+            .orElseThrow { IllegalArgumentException("게시글을 찾을 수 없습니다: $postId") }
+
+        require(!post.isDeleted()) { "삭제된 게시글에는 좋아요를 할 수 없습니다." }
+
+        post.like(likedBy)
+
+        val savedPost = postRepository.save(post)
+
+        eventPublisher.publishAll(post)
+
+        return savedPost
+    }
+
+    @Transactional(readOnly = true)
     override fun findPosts(first: Int?, after: String?): PostConnection {
         val limit = (first ?: 10).coerceIn(1, 100)
         val actualLimit = limit + 1
@@ -68,6 +128,7 @@ class PostServiceImpl(
         )
     }
 
+    @Transactional(readOnly = true)
     override fun findPostById(id: String): Post? {
         val post = postQueryMapper.findByIdAndNotDeleted(id)?.toDomainModel()
 
@@ -82,6 +143,7 @@ class PostServiceImpl(
         return post
     }
 
+    @Transactional(readOnly = true)
     override fun findPostsByIds(ids: List<String>): List<Post> {
         if (ids.isEmpty()) {
             return emptyList()
@@ -91,6 +153,7 @@ class PostServiceImpl(
             .map { it.toDomainModel() }
     }
 
+    @Transactional(readOnly = true)
     override fun findParticipants(postId: String, first: Int?, after: String?): PostParticipantConnection {
         val limit = (first ?: DEFAULT_PARTICIPANT_LIMIT).coerceIn(1, MAX_PARTICIPANT_LIMIT)
         val totalCount = postParticipantRepository.countActiveByPostId(postId).toInt()
@@ -141,6 +204,7 @@ class PostServiceImpl(
         )
     }
 
+    @Transactional(readOnly = true)
     override fun findAuthor(authorId: String): PostAuthor? {
         val account = accountRepository.findById(authorId).orElse(null) ?: return null
         val profile = account.profile

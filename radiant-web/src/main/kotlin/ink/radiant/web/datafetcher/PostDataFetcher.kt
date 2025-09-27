@@ -22,7 +22,7 @@ import java.time.OffsetDateTime
 
 @DgsComponent
 class PostDataFetcher(
-    private val postQueryService: PostQueryService,
+    private val postService: PostQueryService,
 ) {
 
     @DgsQuery
@@ -31,7 +31,7 @@ class PostDataFetcher(
         @InputArgument after: String?,
         dfe: DgsDataFetchingEnvironment,
     ): PostConnection {
-        val connection = postQueryService.findPosts(first, after)
+        val connection = postService.findPosts(first, after)
         storePostsInContext(dfe, connection.edges.map { it.post })
 
         return PostConnection(
@@ -53,7 +53,7 @@ class PostDataFetcher(
 
     @DgsQuery
     fun post(@InputArgument id: String, dfe: DgsDataFetchingEnvironment): PostResult {
-        val post = postQueryService.findPostById(id)
+        val post = postService.findPostById(id)
         post?.let { storePostsInContext(dfe, listOf(it)) }
 
         return post?.toGraphQLPost()
@@ -78,7 +78,7 @@ class PostDataFetcher(
         val domainPost = context.postsById[source.id]
         val postId = domainPost?.id?.toString() ?: source.id
         val effectiveFirst = first ?: DEFAULT_PARTICIPANT_LIMIT
-        val connection = postQueryService.findParticipants(postId, effectiveFirst, after)
+        val connection = postService.findParticipants(postId, effectiveFirst, after)
 
         return connection.toGraphQLUserConnection()
     }
@@ -98,7 +98,7 @@ class PostDataFetcher(
             return cachedAuthor.toGraphQLUser()
         }
 
-        val author = postQueryService.findAuthor(authorId) ?: return null
+        val author = postService.findAuthor(authorId) ?: return null
         context.authorsById[authorId] = author
 
         return author.toGraphQLUser()

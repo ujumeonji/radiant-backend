@@ -3,7 +3,7 @@
 
 <mapper namespace="ink.radiant.infrastructure.mapper.PostQueryMapper">
 
-    <resultMap id="PostQueryModelResultMap" type="ink.radiant.infrastructure.model.PostQueryModel">
+    <resultMap id="PostQueryModelResultMap" type="ink.radiant.infrastructure.view.PostQueryModel">
         <id property="id" column="id"/>
         <result property="title" column="title"/>
         <result property="body" column="body"/>

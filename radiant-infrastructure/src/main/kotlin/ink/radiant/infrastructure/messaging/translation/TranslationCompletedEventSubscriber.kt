@@ -1,8 +1,8 @@
 package ink.radiant.infrastructure.messaging.translation
 
+import ink.radiant.core.domain.entity.PostEntity
 import ink.radiant.core.domain.event.DomainEvent
 import ink.radiant.core.domain.event.TranslationCompletedEvent
-import ink.radiant.infrastructure.entity.PostEntity
 import ink.radiant.infrastructure.messaging.EventSubscriber
 import ink.radiant.infrastructure.repository.PostRepository
 import ink.radiant.infrastructure.repository.TranslationSessionRepository

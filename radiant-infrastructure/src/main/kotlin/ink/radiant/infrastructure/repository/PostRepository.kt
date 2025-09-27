@@ -1,6 +1,6 @@
 package ink.radiant.infrastructure.repository
 
-import ink.radiant.infrastructure.entity.PostEntity
+import ink.radiant.core.domain.entity.PostEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository

@@ -1,6 +1,6 @@
 package ink.radiant.fixture
 
-import ink.radiant.infrastructure.entity.PostEntity
+import ink.radiant.core.domain.entity.PostEntity
 import java.util.UUID
 
 object PostEntityFixture {

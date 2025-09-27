@@ -3,7 +3,7 @@
 
 <mapper namespace="ink.radiant.infrastructure.mapper.TrendingQueryMapper">
 
-    <resultMap id="TrendingQueryModelResultMap" type="ink.radiant.infrastructure.model.TrendingQueryModel">
+    <resultMap id="TrendingQueryModelResultMap" type="ink.radiant.infrastructure.view.TrendingQueryModel">
         <result property="postId" column="post_id"/>
         <result property="viewCount" column="view_count"/>
         <result property="trendScore" column="trend_score"/>

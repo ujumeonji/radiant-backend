@@ -1,0 +1,18 @@
+package ink.radiant.core.domain.event
+
+import java.time.Instant
+import java.util.UUID
+
+data class PostCreatedEvent(
+    override val eventId: UUID = UUID.randomUUID(),
+    override val aggregateId: String,
+    override val eventType: String = "PostCreated",
+    override val occurredAt: Instant = Instant.now(),
+    override val version: Int = 1,
+    override val metadata: EventMetadata = EventMetadata(),
+    val postId: String,
+    val title: String,
+    val body: String?,
+    val authorId: String,
+    val thumbnailUrl: String? = null,
+) : DomainEvent

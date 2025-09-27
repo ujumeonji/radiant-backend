@@ -1,12 +1,11 @@
 package ink.radiant.command.service
 
+import ink.radiant.core.domain.entity.AccountEntity
+import ink.radiant.core.domain.entity.OAuthProvider
 import ink.radiant.core.domain.model.Account
 import ink.radiant.core.domain.model.OAuthAccount
-import ink.radiant.infrastructure.entity.AccountEntity
-import ink.radiant.infrastructure.entity.OAuthProvider
 import ink.radiant.infrastructure.repository.AccountRepository
 import ink.radiant.infrastructure.repository.ProfileRepository
-import ink.radiant.query.service.UserQueryService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -15,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 class UserServiceImpl(
     private val accountRepository: AccountRepository,
     private val profileRepository: ProfileRepository,
-) : UserCommandService, UserQueryService {
+) : UserCommandService {
 
     override fun findOrCreateUser(oauthUser: OAuthAccount): Account {
         val provider = OAuthProvider.valueOf(oauthUser.provider.uppercase())

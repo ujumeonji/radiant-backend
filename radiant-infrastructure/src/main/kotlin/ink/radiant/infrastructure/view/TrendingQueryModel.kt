@@ -1,4 +1,4 @@
-package ink.radiant.infrastructure.model
+package ink.radiant.infrastructure.view
 
 import java.time.OffsetDateTime
 

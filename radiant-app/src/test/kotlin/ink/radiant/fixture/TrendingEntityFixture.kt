@@ -1,6 +1,6 @@
 package ink.radiant.fixture
 
-import ink.radiant.infrastructure.entity.TrendingEntity
+import ink.radiant.core.domain.entity.TrendingEntity
 import java.time.OffsetDateTime
 
 object TrendingEntityFixture {

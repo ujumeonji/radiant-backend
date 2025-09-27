@@ -1,30 +1,24 @@
 package ink.radiant.core.domain.aggregate
 
+import ink.radiant.core.domain.entity.BaseEntity
 import ink.radiant.core.domain.event.DomainEvent
+import jakarta.persistence.Transient
 
-abstract class AggregateRoot<T : AggregateId>(
-    val id: T,
-) {
-    private val _uncommittedEvents = mutableListOf<DomainEvent>()
+abstract class AggregateRoot : BaseEntity() {
+    @Transient
+    protected val internalUncommittedEvents = mutableListOf<DomainEvent>()
 
-    var version: Long = 0
+    @Transient
+    var aggregateVersion: Long = 0
 
-    val uncommittedEvents: List<DomainEvent>
-        get() = _uncommittedEvents.toList()
-
-    protected fun applyEvent(event: DomainEvent) {
-        applyEventInternal(event)
-        _uncommittedEvents.add(event)
-    }
-
-    fun replayEvent(event: DomainEvent) {
-        applyEventInternal(event)
-        version++
-    }
+    val uncommittedEvents: List<DomainEvent> get() =
+        internalUncommittedEvents.toList()
 
     fun markEventsAsCommitted() {
-        _uncommittedEvents.clear()
+        internalUncommittedEvents.clear()
     }
 
-    protected abstract fun applyEventInternal(event: DomainEvent)
+    protected fun applyEvent(event: DomainEvent) {
+        internalUncommittedEvents.add(event)
+    }
 }

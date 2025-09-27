@@ -1,11 +1,11 @@
 package ink.radiant.e2e
 
 import ink.radiant.base.BaseGraphQLTest
+import ink.radiant.core.domain.entity.PostEntity
+import ink.radiant.core.domain.entity.PostParticipantEntity
+import ink.radiant.core.domain.entity.ProfessionalField
 import ink.radiant.fixture.AccountEntityFixture
 import ink.radiant.fixture.PostEntityFixture
-import ink.radiant.infrastructure.entity.PostEntity
-import ink.radiant.infrastructure.entity.PostParticipantEntity
-import ink.radiant.infrastructure.entity.ProfessionalField
 import ink.radiant.infrastructure.repository.AccountRepository
 import ink.radiant.infrastructure.repository.PostParticipantRepository
 import ink.radiant.infrastructure.repository.PostRepository
@@ -345,7 +345,7 @@ class PostGraphQLTest : BaseGraphQLTest() {
         val postToDelete = postRepository.findById(
             "00000000-0000-0000-0000-000000000002",
         ).orElseThrow()
-        postToDelete.markAsDeleted()
+        postToDelete.markAsDeleted(deletedBy = null)
         postRepository.save(postToDelete)
 
         val query = """

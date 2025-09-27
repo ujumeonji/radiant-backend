@@ -1,0 +1,16 @@
+package ink.radiant.core.domain.event
+
+import java.time.Instant
+import java.util.UUID
+
+data class PostLikedEvent(
+    override val eventId: UUID = UUID.randomUUID(),
+    override val aggregateId: String,
+    override val eventType: String = "PostLiked",
+    override val occurredAt: Instant = Instant.now(),
+    override val version: Int = 1,
+    override val metadata: EventMetadata = EventMetadata(),
+    val postId: String,
+    val likedBy: String,
+    val totalLikes: Int,
+) : DomainEvent

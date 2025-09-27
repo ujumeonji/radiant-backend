@@ -1,8 +1,8 @@
 package ink.radiant.command.service
 
+import ink.radiant.core.domain.entity.TrendingEntity
 import ink.radiant.core.domain.event.PostViewedEvent
 import ink.radiant.core.domain.model.Post
-import ink.radiant.infrastructure.entity.TrendingEntity
 import ink.radiant.infrastructure.mapper.TrendingQueryMapper
 import ink.radiant.infrastructure.repository.TrendingCommandRepository
 import ink.radiant.query.service.PostQueryService

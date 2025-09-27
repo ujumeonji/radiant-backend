@@ -1,4 +1,4 @@
-package ink.radiant.infrastructure.entity
+package ink.radiant.core.domain.entity
 
 import jakarta.persistence.*
 import java.util.UUID

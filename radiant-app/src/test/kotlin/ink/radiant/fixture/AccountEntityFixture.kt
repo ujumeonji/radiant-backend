@@ -1,7 +1,7 @@
 package ink.radiant.fixture
 
-import ink.radiant.infrastructure.entity.AccountEntity
-import ink.radiant.infrastructure.entity.OAuthProvider
+import ink.radiant.core.domain.entity.AccountEntity
+import ink.radiant.core.domain.entity.OAuthProvider
 
 object AccountEntityFixture {
 

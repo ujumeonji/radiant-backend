@@ -1,5 +1,6 @@
 package ink.radiant.infrastructure.messaging
 
+import ink.radiant.core.domain.aggregate.AggregateRoot
 import ink.radiant.core.domain.event.DomainEvent
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
@@ -16,5 +17,10 @@ class EventPublisher(
         events.forEach { event ->
             publish(event)
         }
+    }
+
+    fun publishAll(aggregateRoot: AggregateRoot) {
+        aggregateRoot.uncommittedEvents.forEach { event -> publish(event) }
+        aggregateRoot.markEventsAsCommitted()
     }
 }

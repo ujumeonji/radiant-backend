@@ -1,4 +1,4 @@
-package ink.radiant.infrastructure.entity
+package ink.radiant.core.domain.entity
 
 import ink.radiant.core.domain.model.Language
 import ink.radiant.core.domain.model.SentencePair

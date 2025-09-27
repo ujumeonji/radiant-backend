@@ -1,6 +1,6 @@
 package ink.radiant.infrastructure.repository
 
-import ink.radiant.infrastructure.entity.ProfileEntity
+import ink.radiant.core.domain.entity.ProfileEntity
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
