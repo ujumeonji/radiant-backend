@@ -1,6 +1,10 @@
 package ink.radiant.infrastructure.entity
 
-import jakarta.persistence.*
+import ink.radiant.core.domain.model.SentencePair
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import java.util.UUID
 
 @Entity
@@ -57,5 +61,29 @@ class PostEntity(
 
     override fun hashCode(): Int {
         return id.hashCode()
+    }
+
+    companion object {
+        private const val LINE_SEPARATOR = "\n"
+        private const val DEFAULT_TRANSLATED_TITLE = "번역된 게시글"
+
+        fun fromTranslation(translatedText: String, sentencePairs: List<SentencePair>, authorId: String?): PostEntity {
+            val ordered = sentencePairs.sortedBy { it.order }
+            val translatedTitle = ordered.firstOrNull()?.translated?.takeIf { it.isNotBlank() }
+                ?: DEFAULT_TRANSLATED_TITLE
+            val originalTitle = ordered.firstOrNull()?.original?.takeIf { it.isNotBlank() }
+
+            return PostEntity(
+                title = translatedTitle,
+                body = translatedText,
+                translatedTitle = originalTitle,
+                originalSentences = ordered.joinToString(separator = LINE_SEPARATOR) { it.original.trim() },
+                translatedSentences = ordered.joinToString(separator = LINE_SEPARATOR) { it.translated.trim() },
+                likes = 0,
+                commentsCount = 0,
+                thumbnailUrl = null,
+                authorId = authorId,
+            )
+        }
     }
 }
