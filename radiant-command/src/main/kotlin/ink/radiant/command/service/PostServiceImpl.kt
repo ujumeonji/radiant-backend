@@ -139,7 +139,7 @@ class PostServiceImpl(
         val account = accountRepository.findById(authorId).orElse(null) ?: return null
         val profile = account.profile
 
-        val joinedAt = account.createdAt ?: profile?.createdAt ?: OffsetDateTime.now()
+        val joinedAt = account.createdAt ?: profile?.createdAt ?: OffsetDateTime.MIN
 
         return if (profile != null) {
             PostAuthor(
@@ -214,7 +214,7 @@ class PostServiceImpl(
     private fun PostParticipantEntity.toDomainParticipant(): PostParticipant {
         val profile = this.profile
         val account = profile.account
-        val joinedAt = account.createdAt ?: profile.createdAt ?: OffsetDateTime.now()
+        val joinedAt = account.createdAt ?: profile.createdAt ?: OffsetDateTime.MIN
 
         return PostParticipant(
             id = account.id,
