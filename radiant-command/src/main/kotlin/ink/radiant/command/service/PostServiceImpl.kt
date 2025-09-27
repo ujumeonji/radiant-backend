@@ -147,39 +147,21 @@ class PostServiceImpl(
 
         val joinedAt = account.createdAt ?: profile?.createdAt ?: OffsetDateTime.MIN
 
-        return if (profile != null) {
-            PostAuthor(
-                id = account.id,
-                username = account.name,
-                name = profile.displayName,
-                avatarUrl = profile.avatarUrl,
-                bio = profile.bio,
-                location = profile.location,
-                websiteUrl = profile.websiteUrl,
-                joinedAt = joinedAt,
-                postsCount = profile.postsCount,
-                viewsCount = profile.viewsCount,
-                followersCount = profile.followersCount,
-                followingCount = profile.followingCount,
-                professionalFields = profile.professionalFields.map { it.name }.toSet(),
-            )
-        } else {
-            PostAuthor(
-                id = account.id,
-                username = account.name,
-                name = account.displayName,
-                avatarUrl = account.avatarUrl,
-                bio = null,
-                location = null,
-                websiteUrl = null,
-                joinedAt = joinedAt,
-                postsCount = 0,
-                viewsCount = 0,
-                followersCount = 0,
-                followingCount = 0,
-                professionalFields = emptySet(),
-            )
-        }
+        return PostAuthor(
+            id = account.id,
+            username = account.name,
+            name = profile?.displayName ?: account.displayName,
+            avatarUrl = profile?.avatarUrl ?: account.avatarUrl,
+            bio = profile?.bio,
+            location = profile?.location,
+            websiteUrl = profile?.websiteUrl,
+            joinedAt = joinedAt,
+            postsCount = profile?.postsCount ?: 0,
+            viewsCount = profile?.viewsCount ?: 0L,
+            followersCount = profile?.followersCount ?: 0,
+            followingCount = profile?.followingCount ?: 0,
+            professionalFields = profile?.professionalFields?.map { it.name }?.toSet() ?: emptySet(),
+        )
     }
 
     private fun encodeCursor(dateTime: OffsetDateTime): String {
