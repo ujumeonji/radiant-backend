@@ -1,7 +1,7 @@
 package ink.radiant.command.service
 
-import ink.radiant.core.domain.model.User
+import ink.radiant.core.domain.model.Account
 
 interface UserCommandService {
-    fun findOrCreateUser(oauthUser: User): User
+    fun findOrCreateUser(oauthAccount: Account): Account
 }
