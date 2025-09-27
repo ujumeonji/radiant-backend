@@ -1,7 +1,7 @@
 package ink.radiant.web.service
 
 import ink.radiant.command.service.UserCommandService
-import ink.radiant.core.domain.model.OAuthUser
+import ink.radiant.core.domain.model.OAuthAccount
 import ink.radiant.web.dto.*
 import ink.radiant.web.service.oauth.GitHubOAuthService
 import ink.radiant.web.service.oauth.GoogleOAuthService
@@ -58,7 +58,7 @@ class AuthService(
         }
 
         val user = userCommandService.findOrCreateUser(
-            OAuthUser(
+            OAuthAccount(
                 id = oauthUser.id,
                 username = oauthUser.username,
                 name = oauthUser.name,

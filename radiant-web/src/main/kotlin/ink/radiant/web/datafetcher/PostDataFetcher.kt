@@ -138,23 +138,7 @@ class PostDataFetcher(
         )
     }
 
-    private fun ink.radiant.core.domain.model.PostParticipant.toGraphQLUser(): User = toGraphQLUser(
-        id = this.id,
-        username = this.username,
-        name = this.name,
-        avatarUrl = this.avatarUrl,
-        bio = this.bio,
-        location = this.location,
-        websiteUrl = this.websiteUrl,
-        joinedAt = this.joinedAt,
-        postsCount = this.postsCount,
-        viewsCount = this.viewsCount,
-        followersCount = this.followersCount,
-        followingCount = this.followingCount,
-        professionalFields = this.professionalFields,
-    )
-
-    private fun PostAuthor.toGraphQLUser(): User = toGraphQLUser(
+    private fun ink.radiant.core.domain.model.User.toGraphQLUser(): User = toGraphQLUser(
         id = this.id,
         username = this.username,
         name = this.name,
