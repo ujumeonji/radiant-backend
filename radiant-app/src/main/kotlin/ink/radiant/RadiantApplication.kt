@@ -1,8 +1,10 @@
 package ink.radiant
 
+import ink.radiant.infrastructure.config.AsyncConfig
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
+import org.springframework.context.annotation.Import
 
 @SpringBootApplication(
     scanBasePackages = [
@@ -16,6 +18,7 @@ import org.springframework.cache.annotation.EnableCaching
     ],
 )
 @EnableCaching
+@Import(AsyncConfig::class)
 class RadiantApplication
 
 fun main(args: Array<String>) {
