@@ -95,7 +95,10 @@ class PostServiceImpl(
         val limit = (first ?: DEFAULT_PARTICIPANT_LIMIT).coerceIn(1, MAX_PARTICIPANT_LIMIT)
         val totalCount = postParticipantRepository.countActiveByPostId(postId).toInt()
         if (totalCount == 0) {
-            return emptyParticipantConnection()
+            return emptyParticipantConnection(
+                totalCount = 0,
+                hasPreviousPage = false,
+            )
         }
 
         val anchor = after?.let { decodeParticipantCursor(it) }
@@ -108,7 +111,10 @@ class PostServiceImpl(
         )
 
         if (participants.isEmpty()) {
-            return emptyParticipantConnection()
+            return emptyParticipantConnection(
+                totalCount = totalCount,
+                hasPreviousPage = after != null,
+            )
         }
 
         val hasNextPage = participants.size > limit
@@ -200,16 +206,17 @@ class PostServiceImpl(
         return ParticipantCursor(createdAt = createdAt, id = id)
     }
 
-    private fun emptyParticipantConnection(): PostParticipantConnection = PostParticipantConnection(
-        edges = emptyList(),
-        pageInfo = PageInfo(
-            hasNextPage = false,
-            hasPreviousPage = false,
-            startCursor = null,
-            endCursor = null,
-        ),
-        totalCount = 0,
-    )
+    private fun emptyParticipantConnection(totalCount: Int, hasPreviousPage: Boolean): PostParticipantConnection =
+        PostParticipantConnection(
+            edges = emptyList(),
+            pageInfo = PageInfo(
+                hasNextPage = false,
+                hasPreviousPage = hasPreviousPage,
+                startCursor = null,
+                endCursor = null,
+            ),
+            totalCount = totalCount,
+        )
 
     private fun PostParticipantEntity.toDomainParticipant(): PostParticipant {
         val profile = this.profile
