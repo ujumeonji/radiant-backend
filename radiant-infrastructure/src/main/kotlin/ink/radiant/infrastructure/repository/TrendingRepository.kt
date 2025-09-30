@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 @Repository
-interface TrendingCommandRepository : JpaRepository<TrendingEntity, String> {
+interface TrendingRepository : JpaRepository<TrendingEntity, String> {
 
     @Query("SELECT t FROM TrendingEntity t WHERE t.postId = :postId AND t.deletedAt IS NULL")
     fun findByPostId(postId: String): TrendingEntity?

@@ -1,4 +1,4 @@
-package ink.radiant.command
+package ink.radiant.command.command
 
 import ink.radiant.core.domain.exception.TranslationInputException
 import ink.radiant.core.domain.exception.TranslationLengthExceededException

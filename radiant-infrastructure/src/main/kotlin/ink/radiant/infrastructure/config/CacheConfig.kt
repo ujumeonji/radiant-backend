@@ -1,4 +1,4 @@
-package ink.radiant.config
+package ink.radiant.infrastructure.config
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.springframework.cache.CacheManager

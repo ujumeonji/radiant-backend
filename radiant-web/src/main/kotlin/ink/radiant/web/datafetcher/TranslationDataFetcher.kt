@@ -4,7 +4,7 @@ import com.netflix.graphql.dgs.DgsComponent
 import com.netflix.graphql.dgs.DgsMutation
 import com.netflix.graphql.dgs.DgsQuery
 import com.netflix.graphql.dgs.InputArgument
-import ink.radiant.command.RequestTranslationCommand
+import ink.radiant.command.command.RequestTranslationCommand
 import ink.radiant.command.service.TranslationCommandService
 import ink.radiant.core.domain.model.Language
 import ink.radiant.core.domain.model.LanguageCode

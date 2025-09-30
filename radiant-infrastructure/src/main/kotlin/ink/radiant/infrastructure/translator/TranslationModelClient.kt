@@ -1,4 +1,4 @@
-package ink.radiant.infrastructure.ai
+package ink.radiant.infrastructure.translator
 
 import ink.radiant.core.domain.model.LanguageCode
 import ink.radiant.core.domain.model.SentencePair

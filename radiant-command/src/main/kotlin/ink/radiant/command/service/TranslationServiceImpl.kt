@@ -1,6 +1,6 @@
 package ink.radiant.command.service
 
-import ink.radiant.command.RequestTranslationCommand
+import ink.radiant.command.command.RequestTranslationCommand
 import ink.radiant.core.domain.entity.TranslationSessionEntity
 import ink.radiant.core.domain.entity.toDomainSession
 import ink.radiant.core.domain.entity.toResult
@@ -17,12 +17,12 @@ import ink.radiant.core.domain.model.TranslationMetadata
 import ink.radiant.core.domain.model.TranslationResult
 import ink.radiant.core.domain.model.TranslationSession
 import ink.radiant.core.domain.model.TranslationSessionId
-import ink.radiant.infrastructure.ai.LanguageDetectionService
-import ink.radiant.infrastructure.ai.TranslationModelClient
-import ink.radiant.infrastructure.ai.TranslationModelRequest
-import ink.radiant.infrastructure.ai.TranslationProviderException
 import ink.radiant.infrastructure.messaging.EventPublisher
 import ink.radiant.infrastructure.repository.TranslationSessionRepository
+import ink.radiant.infrastructure.translator.LanguageDetectionService
+import ink.radiant.infrastructure.translator.TranslationModelClient
+import ink.radiant.infrastructure.translator.TranslationModelRequest
+import ink.radiant.infrastructure.translator.TranslationProviderException
 import ink.radiant.query.service.TranslationQueryService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

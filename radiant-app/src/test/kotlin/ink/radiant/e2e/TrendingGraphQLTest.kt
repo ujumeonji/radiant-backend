@@ -5,7 +5,7 @@ import ink.radiant.fixture.PostEntityFixture
 import ink.radiant.fixture.TrendingEntityFixture
 import ink.radiant.infrastructure.mapper.TrendingQueryMapper
 import ink.radiant.infrastructure.repository.PostRepository
-import ink.radiant.infrastructure.repository.TrendingCommandRepository
+import ink.radiant.infrastructure.repository.TrendingRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,7 +20,7 @@ class TrendingGraphQLTest : BaseGraphQLTest() {
     private lateinit var postRepository: PostRepository
 
     @Autowired
-    private lateinit var trendingRepository: TrendingCommandRepository
+    private lateinit var trendingRepository: TrendingRepository
 
     @Autowired
     private lateinit var trendingQueryMapper: TrendingQueryMapper

@@ -1,4 +1,4 @@
-package ink.radiant.infrastructure.ai
+package ink.radiant.infrastructure.translator
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -9,12 +9,11 @@ import ink.radiant.core.domain.model.TranslationMetadata
 import org.springframework.ai.chat.model.ChatModel
 import org.springframework.ai.chat.prompt.Prompt
 import org.springframework.ai.chat.prompt.PromptTemplate
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 
 @Service
-class SpringAITranslationService(
-    @Qualifier("translationChatClient") private val chatClient: ChatModel,
+class TranslationService(
+    private val chatClient: ChatModel,
     private val objectMapper: ObjectMapper,
 ) : TranslationModelClient {
 

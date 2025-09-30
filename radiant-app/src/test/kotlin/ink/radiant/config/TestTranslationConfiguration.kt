@@ -3,9 +3,9 @@ package ink.radiant.config
 import ink.radiant.core.domain.model.LanguageCode
 import ink.radiant.core.domain.model.SentencePair
 import ink.radiant.core.domain.model.TranslationMetadata
-import ink.radiant.infrastructure.ai.TranslationModelClient
-import ink.radiant.infrastructure.ai.TranslationModelRequest
-import ink.radiant.infrastructure.ai.TranslationModelResponse
+import ink.radiant.infrastructure.translator.TranslationModelClient
+import ink.radiant.infrastructure.translator.TranslationModelRequest
+import ink.radiant.infrastructure.translator.TranslationModelResponse
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary

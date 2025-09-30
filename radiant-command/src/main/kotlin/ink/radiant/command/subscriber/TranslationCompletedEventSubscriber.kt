@@ -1,4 +1,4 @@
-package ink.radiant.infrastructure.messaging.translation
+package ink.radiant.command.subscriber
 
 import ink.radiant.core.domain.entity.PostEntity
 import ink.radiant.core.domain.event.DomainEvent
