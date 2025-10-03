@@ -26,6 +26,11 @@ class SecurityConfig(
             .csrf { it.disable() }
             .httpBasic { it.disable() }
             .formLogin { it.disable() }
+            .oauth2Login { authLoginConfigurer ->
+                authLoginConfigurer.redirectionEndpoint {
+                    it.baseUri("/api/auth/oauth2/callback/*")
+                }
+            }
             .logout { it.disable() }
             .sessionManagement { manager ->
                 manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
