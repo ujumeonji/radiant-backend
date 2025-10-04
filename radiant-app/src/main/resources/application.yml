@@ -34,6 +34,7 @@ spring:
             client-secret: ${GITHUB_CLIENT_SECRET:your-github-client-secret}
             redirect-uri: ${GITHUB_REDIRECT_URI:http://localhost:8080/api/auth/oauth2/callback/github}
             scope:
+              - read:user
               - user:email
             authorization-grant-type: authorization_code
           google:
@@ -50,8 +51,6 @@ jwt:
   secret: ${JWT_SECRET}
   access-token:
     expiration: 3600
-  refresh-token:
-    expiration: 86400
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
