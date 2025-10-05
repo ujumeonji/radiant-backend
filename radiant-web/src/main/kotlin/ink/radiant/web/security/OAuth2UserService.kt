@@ -50,7 +50,7 @@ class OAuth2UserService(
     }
 
     private fun mapGitHubUser(user: OAuth2User): OAuthAccount {
-        val id = user.getRequiredAttribute<String>("id", "GitHub")
+        val id = "${user.getRequiredAttribute<Int>("id", "GitHub")}"
         val login = user.getRequiredAttribute<String>("login", "GitHub")
         val email = user.getAttribute<String>("email")?.takeIf(String::isNotBlank) ?: "$login@github.local"
         val name = user.getAttribute<String>("name")?.takeIf(String::isNotBlank) ?: login
