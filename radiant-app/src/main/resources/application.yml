@@ -8,11 +8,11 @@ spring:
 
   ai:
     openai:
-      api-key: ${OPENAI_API_KEY:sk-or-v1-xxx}
-      base-url: ${OPENAI_BASE_URL:https://openrouter.ai/api}
+      api-key: ${OPENAI_API_KEY}
+      base-url: ${OPENAI_BASE_URL}
       chat:
         options:
-          model: ${OPENAI_MODEL:gpt-4o-mini}
+          model: ${OPENAI_MODEL}
           temperature: 0.2
           max-tokens: 2048
 
@@ -30,28 +30,25 @@ spring:
       client:
         registration:
           github:
-            client-id: ${GITHUB_CLIENT_ID:your-github-client-id}
-            client-secret: ${GITHUB_CLIENT_SECRET:your-github-client-secret}
-            redirect-uri: ${GITHUB_REDIRECT_URI:http://localhost:8080/api/auth/oauth2/callback/github}
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+            redirect-uri: ${GITHUB_REDIRECT_URI}
             scope:
+              - read:user
               - user:email
-            authorization-grant-type: authorization_code
           google:
-            client-id: ${GOOGLE_CLIENT_ID:your-google-client-id}
-            client-secret: ${GOOGLE_CLIENT_SECRET:your-google-client-secret}
-            redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:8080/api/auth/oauth2/callback/google}
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: ${GOOGLE_REDIRECT_URI}
             scope:
               - openid
               - profile
               - email
-            authorization-grant-type: authorization_code
 
 jwt:
   secret: ${JWT_SECRET}
   access-token:
     expiration: 3600
-  refresh-token:
-    expiration: 86400
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
@@ -62,10 +59,11 @@ mybatis:
 radiant:
   translation:
     executor:
-      core-pool-size: ${TRANSLATION_EXECUTOR_CORE_POOL_SIZE:4}
-      max-pool-size: ${TRANSLATION_EXECUTOR_MAX_POOL_SIZE:8}
-      queue-capacity: ${TRANSLATION_EXECUTOR_QUEUE_CAPACITY:100}
-      keep-alive-seconds: ${TRANSLATION_EXECUTOR_KEEP_ALIVE_SECONDS:60}
-      await-termination-seconds: ${TRANSLATION_EXECUTOR_AWAIT_TERMINATION_SECONDS:30}
+      core-pool-size: ${TRANSLATION_EXECUTOR_CORE_POOL_SIZE}
+      max-pool-size: ${TRANSLATION_EXECUTOR_MAX_POOL_SIZE}
+      queue-capacity: ${TRANSLATION_EXECUTOR_QUEUE_CAPACITY}
+      keep-alive-seconds: ${TRANSLATION_EXECUTOR_KEEP_ALIVE_SECONDS}
+      await-termination-seconds: ${TRANSLATION_EXECUTOR_AWAIT_TERMINATION_SECONDS}
+
   security:
-    admin-tokens: ${RADIANT_ADMIN_TOKENS:test-admin-token}
+    admin-tokens: ${RADIANT_ADMIN_TOKENS}
