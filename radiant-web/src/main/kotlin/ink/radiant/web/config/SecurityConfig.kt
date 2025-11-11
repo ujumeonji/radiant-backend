@@ -103,7 +103,6 @@ class SecurityConfig(
             val oAuth2User = authentication.principal as OAuth2User
 
             val accountId = oAuth2User.getRequiredAttribute<String>(RADIANT_ACCOUNT_ID_ATTRIBUTE)
-            val email = oAuth2User.getRequiredAttribute<String>(RADIANT_ACCOUNT_EMAIL_ATTRIBUTE)
 
             val jwtToken = generateToken(accountId)
 
