@@ -1,6 +1,5 @@
 package ink.radiant.web.config
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import ink.radiant.web.security.AdminTokenAuthenticationFilter
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -36,8 +35,8 @@ class SecurityConfig(
     fun securityFilterChain(
         http: HttpSecurity,
         encoder: JwtEncoder,
-        objectMapper: ObjectMapper,
         @Value("\${jwt.access-token.expiration}") expiration: Long,
+        @Value("\${radiant.oauth2.redirect-url}") redirectUrl: String,
     ): SecurityFilterChain {
         val adminTokens = parseTokens(adminTokensProperty)
 
@@ -56,8 +55,8 @@ class SecurityConfig(
                 authLoginConfigurer.successHandler(
                     OAuth2AuthenticationSuccessHandler(
                         encoder,
-                        objectMapper,
                         expiration,
+                        redirectUrl,
                     ),
                 )
             }
@@ -91,8 +90,8 @@ class SecurityConfig(
 
     private class OAuth2AuthenticationSuccessHandler(
         private val encoder: JwtEncoder,
-        private val objectMapper: ObjectMapper,
         private val expiration: Long,
+        private val redirectUrl: String,
     ) : SimpleUrlAuthenticationSuccessHandler() {
 
         override fun onAuthenticationSuccess(
@@ -106,16 +105,13 @@ class SecurityConfig(
 
             val jwtToken = generateToken(accountId)
 
-            response.contentType = CONTENT_TYPE_JSON
-            response.characterEncoding = RESPONSE_ENCODING_UTF8
+            val redirectUrlWithParams = buildRedirectUrl(jwtToken, accountId)
 
-            val responseData = mutableMapOf(
-                RESPONSE_TOKEN_KEY to jwtToken,
-                RESPONSE_TYPE_KEY to TOKEN_TYPE_BEARER,
-                RESPONSE_ACCOUNT_ID_KEY to accountId,
-            )
+            response.sendRedirect(redirectUrlWithParams)
+        }
 
-            response.writer.write(objectMapper.writeValueAsString(responseData))
+        private fun buildRedirectUrl(token: String, accountId: String): String {
+            return "$redirectUrl?token=$token&type=$TOKEN_TYPE_BEARER&accountId=$accountId"
         }
 
         private fun generateToken(accountId: String): String {
@@ -138,11 +134,6 @@ class SecurityConfig(
             getAttribute<T>(name) ?: error("$MISSING_ATTRIBUTE_MESSAGE_PREFIX$name")
 
         private companion object {
-            private const val CONTENT_TYPE_JSON = "application/json"
-            private const val RESPONSE_ENCODING_UTF8 = "UTF-8"
-            private const val RESPONSE_TOKEN_KEY = "token"
-            private const val RESPONSE_TYPE_KEY = "type"
-            private const val RESPONSE_ACCOUNT_ID_KEY = "accountId"
             private const val TOKEN_TYPE_BEARER = "Bearer"
             private const val JWT_ISSUER_SELF = "self"
             private const val JWT_ACCOUNT_ID_CLAIM = "accountId"
@@ -154,7 +145,5 @@ class SecurityConfig(
         private const val DEFAULT_ADMIN_TOKEN = "test-admin-token"
         private const val ADMIN_ROLE = "ROLE_ADMIN"
         private const val RADIANT_ACCOUNT_ID_ATTRIBUTE = "radiantAccountId"
-        private const val RADIANT_ACCOUNT_EMAIL_ATTRIBUTE = "radiantAccountEmail"
-        private const val RADIANT_ACCOUNT_NAME_ATTRIBUTE = "radiantAccountName"
     }
 }
