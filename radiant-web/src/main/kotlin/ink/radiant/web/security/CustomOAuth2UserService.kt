@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 import java.util.Locale
 
 @Service
-class OAuth2UserService(
+class CustomOAuth2UserService(
     private val userCommandService: UserCommandService,
 ) : OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
@@ -29,13 +29,10 @@ class OAuth2UserService(
         val account = userCommandService.findOrCreateUser(oauthAccount)
 
         val attributes = oauth2User.attributes.toMutableMap()
-        attributes[RADIANT_ACCOUNT_ID] = account.id
-        attributes[RADIANT_ACCOUNT_EMAIL] = account.email
-        attributes[RADIANT_ACCOUNT_NAME] = account.name
-
         val principalAttributeName =
             userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
                 ?: oauth2User.name
+        attributes[principalAttributeName] = account.id
 
         return DefaultOAuth2User(oauth2User.authorities.withDefaultRole(), attributes, principalAttributeName)
     }
@@ -95,9 +92,6 @@ class OAuth2UserService(
     companion object {
         private const val EMAIL_DELIMITER = "@"
         private const val DEFAULT_USER_ROLE = "ROLE_USER"
-        private const val RADIANT_ACCOUNT_ID = "radiantAccountId"
-        private const val RADIANT_ACCOUNT_EMAIL = "radiantAccountEmail"
-        private const val RADIANT_ACCOUNT_NAME = "radiantAccountName"
         private const val OAUTH_ERROR_CODE = "invalid_oauth_user"
     }
 }

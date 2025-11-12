@@ -1,6 +1,8 @@
 package ink.radiant.web.config
 
 import ink.radiant.web.security.AdminTokenAuthenticationFilter
+import ink.radiant.web.security.CustomOAuth2UserService
+import ink.radiant.web.security.CustomOidcUserService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
@@ -11,8 +13,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.Authentication
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.JwsHeader
@@ -28,7 +28,8 @@ import java.time.Instant
 @EnableWebSecurity
 class SecurityConfig(
     @param:Value("\${radiant.security.admin-tokens:test-admin-token}") private val adminTokensProperty: String,
-    private val oauth2UserService: OAuth2UserService<OAuth2UserRequest, OAuth2User>,
+    private val oidcUserService: CustomOidcUserService,
+    private val oAuth2UserService: CustomOAuth2UserService,
 ) {
 
     @Bean
@@ -47,7 +48,8 @@ class SecurityConfig(
             .formLogin { it.disable() }
             .oauth2Login { authLoginConfigurer ->
                 authLoginConfigurer.userInfoEndpoint {
-                    it.userService(oauth2UserService)
+                    it.userService(oAuth2UserService)
+                    it.oidcUserService(oidcUserService)
                 }
                 authLoginConfigurer.redirectionEndpoint {
                     it.baseUri("/api/auth/oauth2/callback/*")
@@ -100,11 +102,8 @@ class SecurityConfig(
             authentication: Authentication,
         ) {
             val oAuth2User = authentication.principal as OAuth2User
-
-            val accountId = oAuth2User.getRequiredAttribute<String>(RADIANT_ACCOUNT_ID_ATTRIBUTE)
-
+            val accountId = oAuth2User.name
             val jwtToken = generateToken(accountId)
-
             val redirectUrlWithParams = buildRedirectUrl(jwtToken, accountId)
 
             response.sendRedirect(redirectUrlWithParams)
@@ -144,6 +143,5 @@ class SecurityConfig(
     companion object {
         private const val DEFAULT_ADMIN_TOKEN = "test-admin-token"
         private const val ADMIN_ROLE = "ROLE_ADMIN"
-        private const val RADIANT_ACCOUNT_ID_ATTRIBUTE = "radiantAccountId"
     }
 }
