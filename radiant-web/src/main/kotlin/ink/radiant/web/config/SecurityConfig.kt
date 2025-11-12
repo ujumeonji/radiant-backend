@@ -103,25 +103,24 @@ class SecurityConfig(
         ) {
             val oAuth2User = authentication.principal as OAuth2User
             val accountId = oAuth2User.name
-            val jwtToken = generateToken(accountId)
-            val redirectUrlWithParams = buildRedirectUrl(jwtToken, accountId)
+            val now = Instant.now()
+            val expiresIn = now.plusSeconds(expiration)
+            val jwtToken = generateToken(accountId, now, expiresIn)
+            val redirectUrlWithParams = buildRedirectUrl(jwtToken, accountId, expiresIn)
 
             response.sendRedirect(redirectUrlWithParams)
         }
 
-        private fun buildRedirectUrl(token: String, accountId: String): String {
-            return "$redirectUrl?token=$token&type=$TOKEN_TYPE_BEARER&accountId=$accountId"
+        private fun buildRedirectUrl(token: String, accountId: String, expiresIn: Instant): String {
+            return "$redirectUrl?token=$token&type=$TOKEN_TYPE_BEARER&accountId=$accountId&expiresIn=$expiresIn"
         }
 
-        private fun generateToken(accountId: String): String {
-            val now = Instant.now()
-            val expiresInSeconds = expiration
-
+        private fun generateToken(accountId: String, now: Instant, expiresAt: Instant): String {
             val claimsBuilder = JwtClaimsSet.builder()
                 .issuer(JWT_ISSUER_SELF)
                 .subject(accountId)
                 .issuedAt(now)
-                .expiresAt(now.plusSeconds(expiresInSeconds))
+                .expiresAt(expiresAt)
                 .claim(JWT_ACCOUNT_ID_CLAIM, accountId)
             val claims = claimsBuilder.build()
             val header = JwsHeader.with(MacAlgorithm.HS256).build()
