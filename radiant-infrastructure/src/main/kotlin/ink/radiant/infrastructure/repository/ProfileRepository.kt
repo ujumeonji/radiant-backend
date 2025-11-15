@@ -8,4 +8,8 @@ import org.springframework.stereotype.Repository
 interface ProfileRepository : CrudRepository<ProfileEntity, String> {
 
     fun existsByDisplayName(displayName: String): Boolean
+
+    fun findByDisplayName(displayName: String): ProfileEntity?
+
+    fun findByAccountId(accountId: String): ProfileEntity?
 }

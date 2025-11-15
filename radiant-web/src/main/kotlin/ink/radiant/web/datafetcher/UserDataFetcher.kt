@@ -3,18 +3,50 @@ package ink.radiant.web.datafetcher
 import com.netflix.graphql.dgs.DgsComponent
 import com.netflix.graphql.dgs.DgsQuery
 import com.netflix.graphql.dgs.InputArgument
+import ink.radiant.query.service.UserQueryService
+import ink.radiant.web.codegen.types.MeResult
 import ink.radiant.web.codegen.types.PageInfo
 import ink.radiant.web.codegen.types.Post
 import ink.radiant.web.codegen.types.PostConnection
 import ink.radiant.web.codegen.types.PostEdge
 import ink.radiant.web.codegen.types.ProfessionalField
+import ink.radiant.web.codegen.types.UnauthorizedError
 import ink.radiant.web.codegen.types.User
 import ink.radiant.web.codegen.types.UserConnection
 import ink.radiant.web.codegen.types.UserEdge
+import ink.radiant.web.mapper.UserGraphQLMapper
+import org.springframework.security.core.context.SecurityContextHolder
 import java.time.OffsetDateTime
 
 @DgsComponent
-class UserDataFetcher {
+class UserDataFetcher(
+    private val userQueryService: UserQueryService,
+) {
+
+    @DgsQuery
+    fun me(): MeResult {
+        val authentication = SecurityContextHolder.getContext().authentication
+
+        // Check if user is authenticated
+        if (authentication == null || !authentication.isAuthenticated || authentication.name == "anonymousUser") {
+            return UnauthorizedError(
+                message = "You must be logged in to view your profile",
+                code = "UNAUTHORIZED",
+            )
+        }
+
+        // Get account ID from authentication principal
+        val accountId = authentication.name
+
+        // Fetch user from database
+        val user = userQueryService.findUserByAccountId(accountId)
+            ?: return UnauthorizedError(
+                message = "User not found",
+                code = "USER_NOT_FOUND",
+            )
+
+        return UserGraphQLMapper.toGraphQLUser(user)
+    }
 
     @DgsQuery
     fun recommendedAuthors(@InputArgument first: Int?, @InputArgument after: String?): UserConnection {
