@@ -2,6 +2,7 @@ package ink.radiant.web.security
 
 import ink.radiant.command.service.UserCommandService
 import ink.radiant.core.domain.model.OAuthAccount
+import ink.radiant.web.config.SecurityConfig
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
@@ -29,12 +30,9 @@ class CustomOAuth2UserService(
         val account = userCommandService.findOrCreateUser(oauthAccount)
 
         val attributes = oauth2User.attributes.toMutableMap()
-        val principalAttributeName =
-            userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
-                ?: oauth2User.name
-        attributes[principalAttributeName] = account.id
+        attributes[SecurityConfig.KEY] = account.id
 
-        return DefaultOAuth2User(oauth2User.authorities.withDefaultRole(), attributes, principalAttributeName)
+        return DefaultOAuth2User(oauth2User.authorities.withDefaultRole(), attributes, SecurityConfig.KEY)
     }
 
     private fun Collection<GrantedAuthority>.withDefaultRole(): Collection<GrantedAuthority> =

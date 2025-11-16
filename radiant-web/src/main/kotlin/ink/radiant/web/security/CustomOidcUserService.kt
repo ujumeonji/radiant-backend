@@ -2,6 +2,7 @@ package ink.radiant.web.security
 
 import ink.radiant.command.service.UserCommandService
 import ink.radiant.core.domain.model.OAuthAccount
+import ink.radiant.web.config.SecurityConfig
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest
@@ -31,17 +32,14 @@ class CustomOidcUserService(
         val account = userCommandService.findOrCreateUser(oauthAccount)
 
         val claims = oidcUser.userInfo?.claims?.toMutableMap() ?: mutableMapOf()
-        val principalAttributeName =
-            userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
-                ?: oidcUser.name
-        claims[principalAttributeName] = account.id
+        claims[SecurityConfig.KEY] = account.id
         val updatedUserInfo = OidcUserInfo(claims)
 
         return DefaultOidcUser(
             oidcUser.authorities.withDefaultRole(),
             oidcUser.idToken,
             updatedUserInfo,
-            principalAttributeName,
+            SecurityConfig.KEY
         )
     }
 

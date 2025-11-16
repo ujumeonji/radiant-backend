@@ -102,7 +102,7 @@ class SecurityConfig(
             authentication: Authentication,
         ) {
             val oAuth2User = authentication.principal as OAuth2User
-            val accountId = oAuth2User.name
+            val accountId = oAuth2User.getRequiredAttribute<String>(KEY)
             val now = Instant.now()
             val expiresIn = now.plusSeconds(expiration)
             val jwtToken = generateToken(accountId, now, expiresIn)
@@ -140,6 +140,7 @@ class SecurityConfig(
     }
 
     companion object {
+        const val KEY = "RADIANT_ACCOUNT_SUB"
         private const val DEFAULT_ADMIN_TOKEN = "test-admin-token"
         private const val ADMIN_ROLE = "ROLE_ADMIN"
     }
